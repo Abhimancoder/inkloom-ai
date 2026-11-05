@@ -2,13 +2,7 @@ import mongoose from 'mongoose'
 
 export const connectDB = async () => {
   try {
-    const uri = process.env.MONGODB_URI
-
-    if (!uri) {
-      console.warn('[Inkloom DB] ⚠️ Warning: MONGODB_URI is not defined in backend/.env')
-      console.warn('[Inkloom DB] Running in offline demo mode without database persistence.')
-      return false
-    }
+    const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/inkloom'
 
     // Mask password in logs to protect credentials (security requirement)
     const maskedUri = uri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@')

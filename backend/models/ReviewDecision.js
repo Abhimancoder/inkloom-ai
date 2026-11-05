@@ -16,6 +16,11 @@ const ReviewDecisionSchema = new mongoose.Schema(
       type: String,
       default: 'Human Approver'
     },
+    reviewerRole: {
+      type: String,
+      enum: ['Brand Manager', 'Marketing Team', 'Compliance Officer', 'Legal Team', 'Brand Team'],
+      default: 'Brand Team'
+    },
     reviewerNotes: {
       type: String,
       default: ''

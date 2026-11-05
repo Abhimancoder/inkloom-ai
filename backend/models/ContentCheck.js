@@ -50,6 +50,39 @@ const ContentCheckSchema = new mongoose.Schema(
     draftText: {
       type: String,
       required: [true, 'Draft content text is required']
+    },
+    governanceScore: {
+      type: Number,
+      default: 90
+    },
+    categoryScores: {
+      logoUsage: { type: String, default: 'Passed' },
+      colorCompliance: { type: String, default: 'Passed' },
+      typography: { type: String, default: 'Passed' },
+      messaging: { type: String, default: 'Passed' },
+      imageStyle: { type: String, default: 'Passed' },
+      accessibility: { type: String, default: 'Passed' }
+    },
+    evidence: {
+      colorsFound: { type: [String], default: [] },
+      typographyUsed: { type: String, default: 'Sans-Serif' },
+      messagingTone: { type: String, default: 'Professional' },
+      imageryTags: { type: [String], default: [] }
+    },
+    visualAssets: [
+      {
+        fileName: { type: String },
+        url: { type: String },
+        caption: { type: String },
+        fileType: { type: String, default: 'image' },
+        complianceStatus: { type: String, default: 'Compliant' }
+      }
+    ],
+    readabilityMetrics: {
+      readingEaseScore: { type: Number, default: 65 },
+      readabilityLabel: { type: String, default: 'Standard / Accessible' },
+      wordCount: { type: Number, default: 0 },
+      sentenceCount: { type: Number, default: 0 }
     }
   },
   {

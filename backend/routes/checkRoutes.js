@@ -89,7 +89,12 @@ router.post('/', async (req, res) => {
       criticalCount,
       warningCount,
       passedCount,
-      draftText
+      draftText,
+      governanceScore: deterministicResults.governanceScore || 90,
+      categoryScores: deterministicResults.categoryScores,
+      evidence: deterministicResults.evidence,
+      visualAssets: req.body.visualAssets || [],
+      readabilityMetrics: deterministicResults.readabilityMetrics
     })
 
     // 5. Save each individual Finding in MongoDB

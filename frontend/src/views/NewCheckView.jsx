@@ -11,23 +11,34 @@ export default function NewCheckView({
   const [selectedProfileId, setSelectedProfileId] = useState(
     brandProfiles[0]?.id || ''
   )
-  const [draftText, setDraftText] = useState('')
+  const [visualAsset, setVisualAsset] = useState('peltz.jpg')
   const [isAuditing, setIsAuditing] = useState(false)
 
-  // Sample quick-fill draft for instant hackathon demonstration
+  // Sample quick-fill drafts for instant hackathon demonstration
   const handleLoadSampleDraft = () => {
-    setTitle('Q4 Enterprise Marketing Campaign')
+    setTitle('Acme Q4 Enterprise Marketing Campaign')
     setChannel('Email Marketing')
+    setVisualAsset('peltz.jpg')
     setDraftText(
-      'TechCorp Solutions provides an enterprise-grade governance platform. We are offering the best in class solution at cheap rates to all new customers, guaranteed to eliminate 100% of errors.'
+      'Acme Solutions provides an enterprise-grade governance platform. We are offering the best in class solution at cheap rates to all new customers, guaranteed to eliminate 100% of errors.'
+    )
+  }
+
+  const handleLoadAdCreativeDraft = () => {
+    setTitle('Instagram Retargeting Campaign Creative')
+    setChannel('Ad Copy')
+    setVisualAsset('peltz.jpg')
+    setDraftText(
+      'Acme Solutions is offering an innovative enterprise-grade governance platform. Sign up today for qualifying enterprise accounts.'
     )
   }
 
   const handleLoadCleanDraft = () => {
     setTitle('SOC-2 Compliance Update Newsletter')
     setChannel('Newsletter')
+    setVisualAsset('security-badge.svg')
     setDraftText(
-      'TechCorp Solutions delivers an enterprise-grade governance platform. We are pleased to announce full SOC-2 Type II and ISO 27001 compliance for all hosted accounts.'
+      'Acme Solutions delivers an enterprise-grade governance platform. We are pleased to announce full SOC-2 Type II and ISO 27001 compliance for all hosted accounts.'
     )
   }
 
@@ -37,15 +48,16 @@ export default function NewCheckView({
 
     setIsAuditing(true)
 
-    // Simulate fast deterministic audit processing
+    // Run deterministic + backend audit processing
     setTimeout(() => {
       const selectedProfile = brandProfiles.find((p) => p.id === selectedProfileId)
       onSubmitCheck({
         title: title || 'Untitled Content Draft',
         channel,
         brandProfileId: selectedProfileId,
-        brandProfileName: selectedProfile?.name || 'Standard Brand Profile',
-        draftText
+        brandProfileName: selectedProfile?.name || 'Acme Corp',
+        draftText,
+        visualAssets: visualAsset ? [{ fileName: visualAsset, url: `/assets/${visualAsset}`, caption: 'Ad Creative Asset', complianceStatus: 'Compliant' }] : []
       })
       setIsAuditing(false)
     }, 700)
@@ -70,7 +82,7 @@ export default function NewCheckView({
         </div>
 
         {/* Quick Demo Pre-fill Buttons */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={handleLoadSampleDraft}
@@ -78,6 +90,14 @@ export default function NewCheckView({
             title="Pre-fills draft containing known restricted phrases"
           >
             ⚡ Load Draft with Issues
+          </button>
+          <button
+            type="button"
+            onClick={handleLoadAdCreativeDraft}
+            className="text-xs bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            title="Pre-fills an ad creative check with peltz.jpg"
+          >
+            🖼️ Ad Creative Check (peltz.jpg)
           </button>
           <button
             type="button"
@@ -127,22 +147,40 @@ export default function NewCheckView({
           </div>
         </div>
 
-        {/* Row 2: Brand Profile Selector */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-            Target Brand Profile
-          </label>
-          <select
-            value={selectedProfileId}
-            onChange={(e) => setSelectedProfileId(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white font-medium"
-          >
-            {brandProfiles.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} ({p.industry}) · {p.ruleCount} Rules Active
-              </option>
-            ))}
-          </select>
+        {/* Row 2: Brand Profile Selector & Supported Visual Asset (Slide 5) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Target Brand Profile
+            </label>
+            <select
+              value={selectedProfileId}
+              onChange={(e) => setSelectedProfileId(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white font-medium"
+            >
+              {brandProfiles.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.industry}) · {p.ruleCount} Rules Active
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Supported Visual Asset Attachment (Slide 5)
+            </label>
+            <select
+              value={visualAsset}
+              onChange={(e) => setVisualAsset(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white font-mono"
+            >
+              <option value="peltz.jpg">peltz.jpg (Instagram Story & Banner Creative)</option>
+              <option value="acme-logo.svg">acme-logo.svg (Vector Brand Logo)</option>
+              <option value="security-badge.svg">security-badge.svg (SOC-2 Compliance Badge)</option>
+              <option value="">None (Text-only audit)</option>
+            </select>
+          </div>
         </div>
 
         {/* Row 3: Draft Text Area */}

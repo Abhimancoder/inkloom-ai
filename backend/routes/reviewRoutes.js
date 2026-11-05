@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 // POST /api/reviews - Record a human reviewer decision
 router.post('/', async (req, res) => {
   try {
-    const { checkId, decision, reviewerName, reviewerNotes } = req.body
+    const { checkId, decision, reviewerName, reviewerRole, reviewerNotes } = req.body
 
     if (!checkId || !decision) {
       return res.status(400).json({
@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
       checkId,
       decision,
       reviewerName: reviewerName || 'Human Reviewer',
+      reviewerRole: reviewerRole || 'Brand Team',
       reviewerNotes: reviewerNotes || ''
     })
 

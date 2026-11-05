@@ -119,10 +119,13 @@ python main.py
 
 ---
 
-## 👥 Team Roles & Contributions
-* **Member 1 (User / Abhiman):** Product Design & UI/UX Lead. User journeys, design system, responsive card layouts, Findings screen architecture, review queue workflow, and application flow.
-* **Member 2:** Frontend Developer. React components, Vite configuration, Axios integration, and client-side deterministic verification.
-* **Member 3 (Pranav Sharma):** Backend & AI Developer. Express REST APIs, Mongoose data models, MongoDB Atlas connection, and Python FastAPI/NLP microservice.
+## 👥 Team & Participant Details (CodeNexus Hackathon)
+* **Team Name:** `aryanmishra4551` | **Team ID:** `4565`
+* **College:** Shri Ramswaroop Memorial University (Department of Computer Science)
+* **Aryan Mishra (Team Leader):** Frontend & Full-Stack Developer. Dashboard, upload interface, findings, reports, and component integration.
+* **Pranav Sharma (Participant 2):** Backend & AI Developer. Express REST APIs, Mongoose data models, MongoDB persistence, and Python NLP microservice.
+* **Labeeba Khan (Participant 3):** Research & Documentation Lead. Problem statement validation, testing, brand governance compliance rules, and pitch presentation.
+* **Abhiman Singh Yadav (Participant 4):** UI/UX & Product Lead. Design system (Inkloom Studio Navy/Emerald palette), responsive card layouts, Findings screen architecture, review queue workflow, and application flow.
 
 ---
 

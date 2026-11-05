@@ -59,7 +59,19 @@ router.get('/', async (req, res) => {
 // POST /api/profiles - Create a brand profile
 router.post('/', async (req, res) => {
   try {
-    const { name, industry, tone, restrictedPhrases, requiredTerms, approvedClaims, visualGuidance } = req.body
+    const {
+      name,
+      industry,
+      tone,
+      restrictedPhrases,
+      requiredTerms,
+      approvedClaims,
+      visualGuidance,
+      brandColors,
+      typography,
+      logoGuidance,
+      imageryGuidelines
+    } = req.body
 
     if (!name) {
       return res.status(400).json({ success: false, error: 'Brand name is required' })
@@ -72,7 +84,11 @@ router.post('/', async (req, res) => {
       restrictedPhrases: Array.isArray(restrictedPhrases) ? restrictedPhrases : [],
       requiredTerms: Array.isArray(requiredTerms) ? requiredTerms : [],
       approvedClaims: Array.isArray(approvedClaims) ? approvedClaims : [],
-      visualGuidance: visualGuidance || ''
+      visualGuidance: visualGuidance || '',
+      brandColors: Array.isArray(brandColors) ? brandColors : [{ name: 'Primary', hex: '#142B4A', role: 'Primary' }],
+      typography: typography || { primaryFont: 'Inter, sans-serif' },
+      logoGuidance: logoGuidance || {},
+      imageryGuidelines: imageryGuidelines || {}
     })
 
     res.status(201).json({ success: true, data: newProfile })

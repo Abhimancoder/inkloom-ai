@@ -6,6 +6,9 @@ import NewCheckView from './views/NewCheckView'
 import FindingsView from './views/FindingsView'
 import BrandGuidelinesView from './views/BrandGuidelinesView'
 import ReviewQueueView from './views/ReviewQueueView'
+import MonitoringView from './views/MonitoringView'
+import ReportsView from './views/ReportsView'
+import SettingsView from './views/SettingsView'
 import LandingPageView from './views/LandingPageView'
 
 import {
@@ -19,6 +22,7 @@ import {
   checkBackendHealth,
   getBrandProfiles,
   getContentChecks,
+  getContentCheckDetail,
   submitContentCheck,
   submitReviewDecision,
   updateBrandProfile
@@ -226,7 +230,7 @@ export default function App() {
   }
 
   // 3. Human Review Decision via API
-  const handleReviewDecision = async (queueId, decision, comment) => {
+  const handleReviewDecision = async (queueId, decision, comment, reviewerRole, reviewerName) => {
     const queueItem = reviewQueue.find((q) => q.id === queueId)
 
     if (queueItem?.checkId) {
@@ -234,7 +238,8 @@ export default function App() {
         await submitReviewDecision({
           checkId: queueItem.checkId,
           decision,
-          reviewerName: 'Abhiman (UX Lead)',
+          reviewerName: reviewerName || 'Abhiman (Team Lead)',
+          reviewerRole: reviewerRole || 'Brand Team',
           reviewerNotes: comment
         })
       } catch (err) {
@@ -249,6 +254,20 @@ export default function App() {
         )
       )
     }
+  }
+
+  // Helper to load check details with full MongoDB findings
+  const handleSelectCheckWithFindings = async (check) => {
+    setSelectedCheck(check)
+    try {
+      const detail = await getContentCheckDetail(check._id || check.id)
+      if (detail?.findings && detail.findings.length > 0) {
+        setFindings(detail.findings.map((f) => ({ ...f, id: f._id || f.id })))
+      }
+    } catch (err) {
+      console.warn('[Inkloom] Could not load detailed findings for check:', err.message)
+    }
+    setCurrentView('findings')
   }
 
   // 4. Save Brand Profile via API
@@ -272,13 +291,14 @@ export default function App() {
 
   const viewTitles = {
     dashboard: { title: 'Studio Dashboard', subtitle: 'Real-time overview of content governance and recent reviews' },
+    monitoring: { title: 'Continuous Brand Monitoring', subtitle: 'Real-time multi-channel scanner, regression alerts, and asset health' },
     'new-check': { title: 'New Content Check', subtitle: 'Submit marketing copy or draft for automated inspection' },
     'brand-guidelines': { title: 'Brand Guidelines', subtitle: 'Maintain approved voice, restricted terminology and claims' },
-    findings: { title: 'Audit Findings', subtitle: 'Structured evidence, matched rules and suggested corrections' },
+    findings: { title: 'Audit Findings & Evidence', subtitle: 'Structured evidence, matched rules and suggested corrections' },
     'review-queue': { title: 'Review Queue', subtitle: 'Human reviewer approval gate before content publication' },
+    reports: { title: 'Governance Reports & Analytics', subtitle: 'Audit-ready compliance reports and recurring violation trends' },
     history: { title: 'Audit History & Logs', subtitle: 'Historical record of content checks and reviewer decisions' },
-    reports: { title: 'Governance Reports', subtitle: 'Compliance metrics and recurring brand violation trends' },
-    settings: { title: 'Studio Settings', subtitle: 'Platform preferences and team role configurations' }
+    settings: { title: 'Platform Settings & Roles', subtitle: 'Cross-functional governance permissions and MongoDB diagnostics' }
   }
 
   const activeHeader = viewTitles[currentView] || { title: 'Inkloom AI Studio', subtitle: '' }
@@ -300,7 +320,7 @@ export default function App() {
               <span>{activeHeader.subtitle}</span>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-gray-50 text-gray-500">
                 <span className={`w-1.5 h-1.5 rounded-full ${dbConnected ? 'bg-green-500' : 'bg-amber-400'}`}></span>
-                {dbConnected ? 'MongoDB Atlas Live' : 'Local Offline Mode'}
+                {dbConnected ? 'MongoDB Live (localhost:27017)' : 'Local Offline Mode'}
               </span>
             </span>
           }
@@ -312,8 +332,12 @@ export default function App() {
             <DashboardView
               checks={checks}
               onNavigate={setCurrentView}
-              onSelectCheck={setSelectedCheck}
+              onSelectCheck={handleSelectCheckWithFindings}
             />
+          )}
+
+          {currentView === 'monitoring' && (
+            <MonitoringView />
           )}
 
           {currentView === 'new-check' && (
@@ -345,6 +369,14 @@ export default function App() {
               queueItems={reviewQueue}
               onReviewDecision={handleReviewDecision}
             />
+          )}
+
+          {currentView === 'reports' && (
+            <ReportsView />
+          )}
+
+          {currentView === 'settings' && (
+            <SettingsView />
           )}
 
           {currentView === 'history' && (
@@ -396,15 +428,6 @@ export default function App() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {(currentView === 'reports' || currentView === 'settings') && (
-            <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400 space-y-2">
-              <p className="text-base font-semibold text-gray-700 capitalize">{currentView} Module</p>
-              <p className="text-xs text-gray-400">
-                Active governance module running with live MongoDB Atlas connection.
-              </p>
             </div>
           )}
         </main>

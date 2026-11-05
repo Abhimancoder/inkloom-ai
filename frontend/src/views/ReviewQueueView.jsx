@@ -15,8 +15,8 @@ export default function ReviewQueueView({
   queueItems,
   onReviewDecision
 }) {
-  const [items, setItems] = useState(queueItems)
-  const [comments, setComments] = useState({})
+  const [reviewerRole, setReviewerRole] = useState('Brand Team')
+  const [reviewerName, setReviewerName] = useState('Abhiman (Team Lead)')
 
   const handleCommentChange = (id, text) => {
     setComments((prev) => ({ ...prev, [id]: text }))
@@ -33,13 +33,15 @@ export default function ReviewQueueView({
               ...item,
               status: decision,
               decisionTime: timestamp,
+              reviewerName,
+              reviewerRole,
               reviewerNotes: comment || `Marked as ${decision}`
             }
           : item
       )
     )
 
-    onReviewDecision(id, decision, comment)
+    onReviewDecision(id, decision, comment, reviewerRole, reviewerName)
   }
 
   const pendingItems = items.filter((i) => i.status === 'Pending Decision')
@@ -52,13 +54,45 @@ export default function ReviewQueueView({
         <div>
           <h2 className="text-2xl font-bold text-[#142B4A]">Human Review Queue</h2>
           <p className="text-sm text-gray-500">
-            Human approval gate before publishing. Accept edits, request revisions, or dismiss findings.
+            Human approval gate before publishing. Role-based routing and sign-off authority.
           </p>
         </div>
         <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-50 text-[#B7791F] border border-amber-200 flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5" />
           {pendingItems.length} Pending Review
         </span>
+      </div>
+
+      {/* Reviewer Persona Bar (Slide 3 & 5) */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Signing Off As:</span>
+          <div className="flex flex-wrap gap-1.5">
+            {['Brand Team', 'Legal Team', 'Compliance Officer', 'Marketing Team'].map((role) => (
+              <button
+                key={role}
+                type="button"
+                onClick={() => setReviewerRole(role)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  reviewerRole === role
+                    ? 'bg-[#142B4A] text-white shadow-xs'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {role}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-gray-400">Reviewer:</span>
+          <input
+            type="text"
+            value={reviewerName}
+            onChange={(e) => setReviewerName(e.target.value)}
+            className="px-2.5 py-1 border border-gray-200 rounded text-xs font-medium text-gray-700 focus:outline-none focus:border-[#142B4A]"
+          />
+        </div>
       </div>
 
       {/* Pending Items List */}

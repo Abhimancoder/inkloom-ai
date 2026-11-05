@@ -88,12 +88,13 @@ export const getContentCheckDetail = async (id) => {
 }
 
 // 4. Human Review Decisions
-export const submitReviewDecision = async ({ checkId, decision, reviewerName, reviewerNotes }) => {
+export const submitReviewDecision = async ({ checkId, decision, reviewerName, reviewerRole, reviewerNotes }) => {
   try {
     const response = await client.post('/reviews', {
       checkId,
       decision,
       reviewerName,
+      reviewerRole,
       reviewerNotes
     })
     return response.data?.data
@@ -109,6 +110,89 @@ export const getReviewDecisions = async () => {
     return response.data?.data || []
   } catch (error) {
     console.warn('[Inkloom API] Backend offline, using local reviews cache:', error.message)
+    return null
+  }
+}
+
+// 5. Continuous Channel Monitoring (Slide 4 & 5)
+export const getMonitoringStats = async () => {
+  try {
+    const response = await client.get('/monitoring/stats')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring stats:', error.message)
+    return null
+  }
+}
+
+export const getMonitoringAssets = async () => {
+  try {
+    const response = await client.get('/monitoring/assets')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring assets:', error.message)
+    return []
+  }
+}
+
+export const getMonitoringActivity = async () => {
+  try {
+    const response = await client.get('/monitoring/activity')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring activity:', error.message)
+    return []
+  }
+}
+
+export const triggerChannelScan = async (scanData) => {
+  try {
+    const response = await client.post('/monitoring/trigger-scan', scanData)
+    return response.data?.data
+  } catch (error) {
+    console.error('[Inkloom API] Error triggering channel scan:', error.message)
+    throw error
+  }
+}
+
+// 6. Governance & Compliance Reports (Slide 6)
+export const getReportsSummary = async () => {
+  try {
+    const response = await client.get('/reports/summary')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching reports summary:', error.message)
+    return null
+  }
+}
+
+export const getReportCertificate = async (checkId) => {
+  try {
+    const response = await client.get(`/reports/${checkId}`)
+    return response.data?.data
+  } catch (error) {
+    console.error('[Inkloom API] Error fetching report certificate:', error.message)
+    throw error
+  }
+}
+
+// 7. Proactive Alerts & Activity Stream (Slide 4)
+export const getAlerts = async () => {
+  try {
+    const response = await client.get('/alerts')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching alerts:', error.message)
+    return []
+  }
+}
+
+export const markAlertRead = async (id) => {
+  try {
+    const response = await client.put(`/alerts/${id}/read`)
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error marking alert read:', error.message)
     return null
   }
 }

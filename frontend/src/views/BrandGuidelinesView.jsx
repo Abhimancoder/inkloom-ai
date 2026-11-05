@@ -292,17 +292,78 @@ export default function BrandGuidelinesView({
           ></textarea>
         </div>
 
-        {/* Visual Guidance */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-            Visual Guidance (Colors, Logo Safe Margins)
-          </label>
-          <input
-            type="text"
-            value={formData.visualGuidance || ''}
-            onChange={(e) => setFormData({ ...formData, visualGuidance: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 text-sm text-[#202833]"
-          />
+        {/* Visual Brand Tokens (Colors & Typography - Slide 5) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-gray-50/70 border border-gray-200">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Brand Color Palette Swatches
+            </label>
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              {(formData.brandColors || [
+                { name: 'Navy', hex: '#142B4A' },
+                { name: 'Teal', hex: '#176B59' },
+                { name: 'Charcoal', hex: '#202833' },
+                { name: 'Light', hex: '#F5F7FA' }
+              ]).map((c, i) => (
+                <div key={i} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white border border-gray-200 text-xs">
+                  <div className="w-5 h-5 rounded-md shadow-xs" style={{ backgroundColor: c.hex }}></div>
+                  <span className="font-mono text-[11px] text-gray-700">{c.hex}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400">Locked tokens used to validate design files and creatives</p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Typography & Font Guidance
+            </label>
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="Primary Font (e.g. Inter, system-ui)"
+                value={formData.typography?.primaryFont || 'Inter, sans-serif'}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    typography: { ...formData.typography, primaryFont: e.target.value }
+                  })
+                }
+                className="w-full px-3 py-1.5 rounded border border-gray-200 text-xs font-mono"
+              />
+              <p className="text-[11px] text-gray-400">Heading 24px minimum size requirement</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual Guidance & Logo Margins */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Logo Safe Area & Margins
+            </label>
+            <input
+              type="text"
+              value={formData.logoGuidance?.minClearSpace || '24px padding on all sides'}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  logoGuidance: { ...formData.logoGuidance, minClearSpace: e.target.value }
+                })
+              }
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#202833]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              Upload Guidelines Document (Slide 02)
+            </label>
+            <div className="border border-dashed border-gray-300 rounded-lg p-3 text-center bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+              <span className="text-xs font-semibold text-[#142B4A] block">📄 brand-guidelines-2026.pdf (Uploaded)</span>
+              <span className="text-[10px] text-gray-400">Click to replace or upload new document guidelines</span>
+            </div>
+          </div>
         </div>
 
         {/* Submit */}

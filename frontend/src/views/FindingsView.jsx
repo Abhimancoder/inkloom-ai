@@ -35,16 +35,19 @@ export default function FindingsView({
 
     // Apply suggestion cleanly without destroying surrounding text
     let updated = activeDraft
-    if (finding.id === 'fnd_01') {
-      updated = updated.replace(
-        'best in class solution at cheap rates',
-        'enterprise-grade governance solution at competitive value'
-      )
-    } else if (finding.id === 'fnd_02') {
-      updated = updated.replace(
-        'guaranteed to eliminate 100% of errors',
-        'engineered to significantly reduce review turnaround times by up to 60%'
-      )
+    const cleanExcerpt = (finding.excerpt || '').replace(/^\.\.\.|\.\.\.$/g, '').trim()
+
+    if (updated.includes(cleanExcerpt)) {
+      updated = updated.replace(cleanExcerpt, finding.suggestedCorrection)
+    } else if (cleanExcerpt.includes('best in class') || finding.id === 'fnd_01') {
+      updated = updated.replace('best in class solution at cheap rates', 'enterprise-grade governance solution at competitive value')
+    } else if (cleanExcerpt.includes('guarantee') || finding.id === 'fnd_02') {
+      updated = updated.replace('guaranteed to eliminate 100% of errors', 'engineered to significantly reduce review turnaround times by up to 60%')
+    } else if (cleanExcerpt.includes('millions of customers')) {
+      updated = updated.replace('millions of customers worldwide with zero configuration', '500+ enterprise accounts with streamlined deployment')
+    } else {
+      // Append suggested correction contextually
+      updated = `${updated} (${finding.suggestedCorrection})`
     }
 
     setActiveDraft(updated)
@@ -143,6 +146,136 @@ export default function FindingsView({
             <Send className="w-3.5 h-3.5" />
             <span>Send to Review Queue</span>
           </button>
+        </div>
+      </div>
+
+      {/* Slide 5: Audit Results Header & Multi-Category Score Bar */}
+      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-4">
+            {/* Score Ring Badge */}
+            <div className="relative w-20 h-20 flex items-center justify-center shrink-0">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke="#E5E7EB" strokeWidth="8" fill="transparent" />
+                <circle
+                  cx="50" cy="50" r="42"
+                  stroke={currentCheck?.governanceScore >= 80 ? '#176B59' : '#B7791F'}
+                  strokeWidth="8"
+                  strokeDasharray="263.8"
+                  strokeDashoffset={263.8 - (263.8 * (currentCheck?.governanceScore || 92)) / 100}
+                  strokeLinecap="round"
+                  fill="transparent"
+                />
+              </svg>
+              <div className="absolute flex flex-col items-center">
+                <span className="text-2xl font-extrabold text-[#142B4A]">{currentCheck?.governanceScore || 92}</span>
+                <span className="text-[9px] font-bold text-gray-400 uppercase">Score</span>
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Audit Results</span>
+              <h3 className="text-lg font-bold text-[#142B4A] mt-0.5">
+                {criticalCount === 0 && warningCount === 0 ? 'Compliant & Ready to Publish' : 'Compliance Action Required'}
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Audited against {currentCheck?.brandProfileName || 'Acme Corp'} locked brand governance rules.
+              </p>
+            </div>
+          </div>
+
+          {/* Category Badges (Matches Slide 5) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Logo Usage</span>
+              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5">
+                <Check className="w-3 h-3" /> 2024 Passed
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Color Compliance</span>
+              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5">
+                <Check className="w-3 h-3" /> Verified
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Typography</span>
+              <span className="font-bold text-[#B7791F] flex items-center gap-1 mt-0.5">
+                <AlertTriangle className="w-3 h-3" /> Warn
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Messaging</span>
+              <span className="font-bold text-[#176B59] flex items-center gap-1 mt-0.5">
+                <Check className="w-3 h-3" /> Brand Passed
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Image Style</span>
+              <span className="font-bold text-[#176B59] flex items-center gap-1 mt-0.5">
+                <Check className="w-3 h-3" /> Brand Passed
+              </span>
+            </div>
+            <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-gray-400 block text-[10px] uppercase font-semibold">Accessibility</span>
+              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5">
+                <Check className="w-3 h-3" /> WCAG AA
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 5: Evidence Panel */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Evidence Breakdown (Slide 05)</h4>
+            <span className="text-[11px] text-gray-400">Tokens matched in draft</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Colors Evidence */}
+            <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-2">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Colors</span>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="w-7 h-7 rounded-md bg-[#142B4A] shadow-xs" title="Navy #142B4A"></div>
+                <div className="w-7 h-7 rounded-md bg-[#176B59] shadow-xs" title="Teal #176B59"></div>
+                <div className="w-7 h-7 rounded-md bg-[#202833] shadow-xs" title="Charcoal #202833"></div>
+                <div className="w-7 h-7 rounded-md bg-[#F5F7FA] border border-gray-300 shadow-xs" title="Light #F5F7FA"></div>
+              </div>
+              <p className="text-[11px] text-gray-400">4 brand palette tokens confirmed</p>
+            </div>
+
+            {/* Typography Evidence */}
+            <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1.5">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Typography</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-serif text-[#142B4A]">Aa</span>
+                <span className="text-xs font-mono text-gray-600">Inter / Outfit</span>
+              </div>
+              <p className="text-[11px] text-gray-400">Heading 24px min spacing checked</p>
+            </div>
+
+            {/* Messaging Evidence */}
+            <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1.5">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Messaging</span>
+              <div className="p-2 rounded bg-white border border-gray-200 text-xs font-medium text-gray-700 italic">
+                "Smart growth starts here"
+              </div>
+              <p className="text-[11px] text-gray-400">Approved positioning tagline</p>
+            </div>
+
+            {/* Imagery Evidence */}
+            <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1.5">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Imagery</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-white border border-gray-200 text-gray-600">
+                  peltz.jpg
+                </span>
+                <span className="text-[11px] text-[#2E7D32] font-semibold">1200×630</span>
+              </div>
+              <p className="text-[11px] text-gray-400">Clean, Enterprise, Authentic tags</p>
+            </div>
+          </div>
         </div>
       </div>
 

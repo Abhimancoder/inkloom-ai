@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   LayoutDashboard,
+  Activity,
   PlusCircle,
   BookOpen,
   Search,
@@ -15,13 +16,14 @@ import {
 export default function Sidebar({ currentView, setCurrentView, pendingReviewCount = 2 }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'monitoring', label: 'Continuous Monitoring', icon: Activity },
     { id: 'new-check', label: 'New Content Check', icon: PlusCircle },
     { id: 'brand-guidelines', label: 'Brand Guidelines', icon: BookOpen },
-    { id: 'findings', label: 'Findings', icon: Search, badge: '2 Issues' },
+    { id: 'findings', label: 'Findings & Evidence', icon: Search, badge: '2 Issues' },
     { id: 'review-queue', label: 'Review Queue', icon: CheckSquare, badgeCount: pendingReviewCount },
+    { id: 'reports', label: 'Governance Reports', icon: BarChart3 },
     { id: 'history', label: 'History & Logs', icon: History },
-    { id: 'reports', label: 'Reports', icon: BarChart3 },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'settings', label: 'Settings & Roles', icon: Settings },
   ]
 
   return (

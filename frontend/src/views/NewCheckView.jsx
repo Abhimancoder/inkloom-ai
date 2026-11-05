@@ -12,6 +12,9 @@ export default function NewCheckView({
     brandProfiles[0]?.id || ''
   )
   const [visualAsset, setVisualAsset] = useState('peltz.jpg')
+  const [draftText, setDraftText] = useState(
+    'Acme Solutions provides an enterprise-grade governance platform. We are offering the best in class solution at cheap rates to all new customers, guaranteed to eliminate 100% of errors.'
+  )
   const [isAuditing, setIsAuditing] = useState(false)
 
   // Sample quick-fill drafts for instant hackathon demonstration
@@ -64,58 +67,58 @@ export default function NewCheckView({
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 w-full min-w-0">
+      {/* Responsive Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <button
             onClick={onCancel}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#142B4A] transition-colors mb-2 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#142B4A] transition-colors mb-1.5 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </button>
-          <h2 className="text-2xl font-bold text-[#142B4A]">Submit Content for Brand Review</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#142B4A]">Submit Content for Brand Review</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Check marketing copy, emails, or social posts against approved brand guidelines before publication.
           </p>
         </div>
 
         {/* Quick Demo Pre-fill Buttons */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 self-start sm:self-auto shrink-0">
           <button
             type="button"
             onClick={handleLoadSampleDraft}
-            className="text-xs bg-red-50 text-[#C62828] border border-red-200 hover:bg-red-100 font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            className="text-[11px] sm:text-xs bg-red-50 text-[#C62828] border border-red-200 hover:bg-red-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
             title="Pre-fills draft containing known restricted phrases"
           >
-            ⚡ Load Draft with Issues
+            ⚡ Issues Draft
           </button>
           <button
             type="button"
             onClick={handleLoadAdCreativeDraft}
-            className="text-xs bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            className="text-[11px] sm:text-xs bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
             title="Pre-fills an ad creative check with peltz.jpg"
           >
-            🖼️ Ad Creative Check (peltz.jpg)
+            🖼️ Ad Creative
           </button>
           <button
             type="button"
             onClick={handleLoadCleanDraft}
-            className="text-xs bg-green-50 text-[#2E7D32] border border-green-200 hover:bg-green-100 font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            className="text-[11px] sm:text-xs bg-green-50 text-[#2E7D32] border border-green-200 hover:bg-green-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
             title="Pre-fills a fully compliant draft"
           >
-            ✅ Load Clean Draft
+            ✅ Clean Draft
           </button>
         </div>
       </div>
 
-      {/* Main Form Card */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 shadow-xs p-8 space-y-6">
+      {/* Main Form Card with Responsive Padding */}
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 shadow-xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Row 1: Title & Channel */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Content Check Title
             </label>
             <input
@@ -124,39 +127,39 @@ export default function NewCheckView({
               placeholder="e.g. Q4 Campaign Brief Announcement"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833]"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Content Type / Channel
             </label>
             <select
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] bg-white"
             >
               <option value="Email Marketing">Email Marketing</option>
               <option value="Social Media">Social Media Post</option>
               <option value="Blog Post">Blog Post / Article</option>
               <option value="Press Release">Press Release</option>
-              <option value="Ad Copy">Ad Copy & Landing Page</option>
+              <option value="Ad Copy">Ad Copy &amp; Landing Page</option>
               <option value="Executive Speech">Executive Keynote</option>
             </select>
           </div>
         </div>
 
         {/* Row 2: Brand Profile Selector & Supported Visual Asset (Slide 5) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Target Brand Profile
             </label>
             <select
               value={selectedProfileId}
               onChange={(e) => setSelectedProfileId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white font-medium"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] bg-white font-medium"
             >
               {brandProfiles.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -167,15 +170,15 @@ export default function NewCheckView({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Supported Visual Asset Attachment (Slide 5)
             </label>
             <select
               value={visualAsset}
               onChange={(e) => setVisualAsset(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] bg-white font-mono"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] bg-white font-mono"
             >
-              <option value="peltz.jpg">peltz.jpg (Instagram Story & Banner Creative)</option>
+              <option value="peltz.jpg">peltz.jpg (Instagram Story &amp; Banner Creative)</option>
               <option value="acme-logo.svg">acme-logo.svg (Vector Brand Logo)</option>
               <option value="security-badge.svg">security-badge.svg (SOC-2 Compliance Badge)</option>
               <option value="">None (Text-only audit)</option>
@@ -185,46 +188,46 @@ export default function NewCheckView({
 
         {/* Row 3: Draft Text Area */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
               Draft Content Text
             </label>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="text-[10px] sm:text-xs text-gray-400 font-mono">
               {draftText.length} characters
             </span>
           </div>
           <textarea
             required
-            rows={8}
+            rows={7}
             placeholder="Paste your marketing draft, email body, or social copy here for governance analysis..."
             value={draftText}
             onChange={(e) => setDraftText(e.target.value)}
-            className="w-full p-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833] leading-relaxed resize-y"
+            className="w-full p-3 sm:p-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] leading-relaxed resize-y"
           ></textarea>
         </div>
 
         {/* Audit Engine Notice */}
-        <div className="bg-[#F5F7FA] rounded-lg p-4 border border-gray-200 text-xs text-gray-600 flex items-start gap-3">
+        <div className="bg-[#F5F7FA] rounded-lg p-3 sm:p-4 border border-gray-200 text-xs text-gray-600 flex items-start gap-2.5 sm:gap-3">
           <AlertCircle className="w-4 h-4 text-[#176B59] shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-[#142B4A] block">Deterministic Rule Engine</span>
+          <div className="text-[11px] sm:text-xs">
+            <span className="font-semibold text-[#142B4A] block">Deterministic Rule Engine + Scikit-Learn Model</span>
             Scans draft against restricted terminology, mandatory claims, and approved phrasing. Results require human review before publishing.
           </div>
         </div>
 
-        {/* Form Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+        {/* Form Action Buttons (Responsive on Mobile) */}
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-100">
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 sm:py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isAuditing || !draftText.trim()}
-            className="inline-flex items-center gap-2 bg-[#142B4A] hover:bg-[#1a385f] disabled:opacity-50 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#142B4A] hover:bg-[#1a385f] disabled:opacity-50 text-white font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer text-center"
           >
             {isAuditing ? (
               <>
@@ -234,7 +237,7 @@ export default function NewCheckView({
             ) : (
               <>
                 <span>Run Brand Check</span>
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               </>
             )}
           </button>

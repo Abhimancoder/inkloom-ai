@@ -69,26 +69,26 @@ export default function BrandGuidelinesView({
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 w-full min-w-0">
+      {/* Top Header (Responsive Stack on Phone) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#142B4A]">Brand Guidelines Management</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#142B4A]">Brand Guidelines Management</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Define approved voice, restricted terminology, and approved claims used by the governance engine.
           </p>
         </div>
 
         {isSavedNotice && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-[#2E7D32] border border-green-200">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-[#2E7D32] border border-green-200 self-start sm:self-auto shrink-0">
             <CheckCircle className="w-4 h-4" />
-            <span>Guidelines Saved Successfully!</span>
+            <span>Guidelines Saved!</span>
           </span>
         )}
       </div>
 
-      {/* Brand Profile Selector Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Brand Profile Selector Cards (1 col phone, 2 col tablet/desktop) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {brandProfiles.map((p) => {
           const isSelected = selectedProfile?.id === p.id
 
@@ -96,25 +96,32 @@ export default function BrandGuidelinesView({
             <div
               key={p.id}
               onClick={() => handleSelectProfile(p)}
-              className={`p-5 rounded-xl border transition-all cursor-pointer bg-white shadow-xs ${
+              className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer bg-white shadow-xs ${
                 isSelected
-                  ? 'border-[#142B4A] ring-2 ring-[#142B4A]/10'
-                  : 'border-gray-100 hover:border-gray-300'
+                  ? 'border-[#176B59] ring-2 ring-[#176B59]/20 shadow-sm'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-[#142B4A]">
-                    <Building2 className="w-4 h-4" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
+                      isSelected
+                        ? 'bg-[#176B59] text-white'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    <Building2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#142B4A]">{p.name}</h3>
+                    <h3 className="font-bold text-sm sm:text-base text-[#142B4A]">{p.name}</h3>
                     <p className="text-xs text-gray-400">{p.industry}</p>
                   </div>
                 </div>
+
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    p.status === 'Active'
+                  className={`text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                    p.status === 'Active Locked'
                       ? 'bg-green-50 text-[#2E7D32] border border-green-200'
                       : 'bg-gray-100 text-gray-600'
                   }`}
@@ -122,7 +129,7 @@ export default function BrandGuidelinesView({
                   {p.status}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 line-clamp-1 mt-3">
+              <p className="text-xs text-gray-500 line-clamp-1 mt-2 sm:mt-3">
                 <span className="font-semibold text-gray-700">Tone:</span> {p.tone}
               </p>
             </div>
@@ -130,77 +137,77 @@ export default function BrandGuidelinesView({
         })}
       </div>
 
-      {/* Active Profile Configuration Form */}
-      <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-100 shadow-xs p-8 space-y-6">
-        <div className="border-b border-gray-100 pb-4 flex items-center justify-between">
-          <h3 className="text-base font-bold text-[#142B4A]">
+      {/* Active Profile Configuration Form with Responsive Padding */}
+      <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-100 shadow-xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+        <div className="border-b border-gray-100 pb-3 sm:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <h3 className="text-sm sm:text-base font-bold text-[#142B4A]">
             Configure Profile: {formData.name}
           </h3>
-          <span className="text-xs text-gray-400">Deterministic rule definition</span>
+          <span className="text-[11px] sm:text-xs text-gray-400 font-mono">Deterministic &amp; ML rules</span>
         </div>
 
         {/* Brand Name & Industry */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Brand Profile Name
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833]"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833]"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Industry Category
             </label>
             <input
               type="text"
               value={formData.industry}
               onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833]"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833]"
             />
           </div>
         </div>
 
         {/* Approved Tone */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-            Approved Voice & Tone
+          <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+            Approved Voice &amp; Tone
           </label>
           <input
             type="text"
             value={formData.tone}
             onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
-            placeholder="e.g. Professional, authoritative, customer-focused, innovative"
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-sm text-[#202833]"
+            placeholder="e.g. Professional & Authoritative, customer-focused, innovative"
+            className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833]"
           />
         </div>
 
         {/* Restricted Phrases (Chips) */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
               Restricted Phrases (Flagged as Critical Issues)
             </label>
-            <span className="text-xs text-gray-400">
-              {formData.restrictedPhrases.length} restricted phrases
+            <span className="text-[10px] sm:text-xs text-gray-400">
+              {formData.restrictedPhrases.length} phrases
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg bg-gray-50 border border-gray-200 min-h-[50px] mb-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-200 min-h-[46px] mb-2.5">
             {formData.restrictedPhrases.map((phrase, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-red-50 text-[#C62828] border border-red-200"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-md text-xs font-semibold bg-red-50 text-[#C62828] border border-red-200"
               >
                 <span>"{phrase}"</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveRestrictedPhrase(idx)}
-                  className="hover:text-red-800 cursor-pointer"
+                  className="hover:text-red-800 cursor-pointer text-sm"
                 >
                   ×
                 </button>
@@ -208,18 +215,18 @@ export default function BrandGuidelinesView({
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Add another restricted phrase (e.g. 'miracle', 'free gift')..."
               value={newRestrictedPhrase}
               onChange={(e) => setNewRestrictedPhrase(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20"
+              className="flex-1 px-3.5 py-2 rounded-lg border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20"
             />
             <button
               type="button"
               onClick={handleAddRestrictedPhrase}
-              className="px-4 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer shrink-0"
             >
               Add Phrase
             </button>
@@ -228,26 +235,26 @@ export default function BrandGuidelinesView({
 
         {/* Required Terminology */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
               Required Brand Terminology
             </label>
-            <span className="text-xs text-gray-400">
-              {formData.requiredTerms.length} required terms
+            <span className="text-[10px] sm:text-xs text-gray-400">
+              {formData.requiredTerms.length} terms
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg bg-gray-50 border border-gray-200 min-h-[50px] mb-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-200 min-h-[46px] mb-2.5">
             {formData.requiredTerms.map((term, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-blue-50 text-[#142B4A] border border-blue-200"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-md text-xs font-semibold bg-blue-50 text-[#142B4A] border border-blue-200"
               >
                 <span>{term}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveRequiredTerm(idx)}
-                  className="hover:text-blue-900 cursor-pointer"
+                  className="hover:text-blue-900 cursor-pointer text-sm"
                 >
                   ×
                 </button>
@@ -255,18 +262,18 @@ export default function BrandGuidelinesView({
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Add required term (e.g. 'TechCorp Solutions')..."
               value={newRequiredTerm}
               onChange={(e) => setNewRequiredTerm(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20"
+              className="flex-1 px-3.5 py-2 rounded-lg border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20"
             />
             <button
               type="button"
               onClick={handleAddRequiredTerm}
-              className="px-4 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer shrink-0"
             >
               Add Term
             </button>
@@ -275,8 +282,8 @@ export default function BrandGuidelinesView({
 
         {/* Approved Claims */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-            Approved Claims & Evidence References
+          <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+            Approved Claims &amp; Evidence References
           </label>
           <textarea
             rows={3}
@@ -288,37 +295,37 @@ export default function BrandGuidelinesView({
               })
             }
             placeholder="One approved claim per line..."
-            className="w-full p-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 text-sm text-[#202833] font-mono leading-relaxed"
+            className="w-full p-3 sm:p-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 text-xs sm:text-sm text-[#202833] font-mono leading-relaxed"
           ></textarea>
         </div>
 
         {/* Visual Brand Tokens (Colors & Typography - Slide 5) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-gray-50/70 border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3.5 sm:p-4 rounded-xl bg-gray-50/70 border border-gray-200">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Brand Color Palette Swatches
             </label>
-            <div className="flex flex-wrap items-center gap-3 mb-3">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               {(formData.brandColors || [
                 { name: 'Navy', hex: '#142B4A' },
                 { name: 'Teal', hex: '#176B59' },
                 { name: 'Charcoal', hex: '#202833' },
                 { name: 'Light', hex: '#F5F7FA' }
               ]).map((c, i) => (
-                <div key={i} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white border border-gray-200 text-xs">
-                  <div className="w-5 h-5 rounded-md shadow-xs" style={{ backgroundColor: c.hex }}></div>
-                  <span className="font-mono text-[11px] text-gray-700">{c.hex}</span>
+                <div key={i} className="flex items-center gap-1.5 p-1 rounded-lg bg-white border border-gray-200 text-xs">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shadow-xs shrink-0" style={{ backgroundColor: c.hex }}></div>
+                  <span className="font-mono text-[10px] sm:text-[11px] text-gray-700">{c.hex}</span>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-gray-400">Locked tokens used to validate design files and creatives</p>
+            <p className="text-[10px] sm:text-[11px] text-gray-400">Locked tokens used to validate design files</p>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-              Typography & Font Guidance
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              Typography &amp; Font Guidance
             </label>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <input
                 type="text"
                 placeholder="Primary Font (e.g. Inter, system-ui)"
@@ -331,16 +338,16 @@ export default function BrandGuidelinesView({
                 }
                 className="w-full px-3 py-1.5 rounded border border-gray-200 text-xs font-mono"
               />
-              <p className="text-[11px] text-gray-400">Heading 24px minimum size requirement</p>
+              <p className="text-[10px] sm:text-[11px] text-gray-400">Heading 24px minimum size requirement</p>
             </div>
           </div>
         </div>
 
         {/* Visual Guidance & Logo Margins */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-              Logo Safe Area & Margins
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              Logo Safe Area &amp; Margins
             </label>
             <input
               type="text"
@@ -351,26 +358,26 @@ export default function BrandGuidelinesView({
                   logoGuidance: { ...formData.logoGuidance, minClearSpace: e.target.value }
                 })
               }
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#202833]"
+              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 text-xs sm:text-sm text-[#202833]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Upload Guidelines Document (Slide 02)
             </label>
             <div className="border border-dashed border-gray-300 rounded-lg p-3 text-center bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-              <span className="text-xs font-semibold text-[#142B4A] block">📄 brand-guidelines-2026.pdf (Uploaded)</span>
-              <span className="text-[10px] text-gray-400">Click to replace or upload new document guidelines</span>
+              <span className="text-xs font-semibold text-[#142B4A] block truncate">📄 brand-guidelines-2026.pdf (Uploaded)</span>
+              <span className="text-[10px] text-gray-400">Click to replace or upload new PDF</span>
             </div>
           </div>
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end pt-4 border-t border-gray-100">
+        <div className="flex justify-end pt-3 sm:pt-4 border-t border-gray-100">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-[#142B4A] hover:bg-[#1a385f] text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#142B4A] hover:bg-[#1a385f] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Save Brand Guidelines</span>

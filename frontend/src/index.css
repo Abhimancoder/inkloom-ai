@@ -15,6 +15,65 @@ body {
   margin: 0;
   background-color: #F5F7FA;
   color: #202833;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ================================================================ */
+/* RESPONSIVE MEDIA QUERIES & MOBILE TOUCH OPTIMIZATIONS           */
+/* ================================================================ */
+
+/* Fast touch response on mobile & tablet without double-tap delay */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Smooth horizontal scroll container on phones & tablets */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Hide scrollbar while preserving scroll functionality for tab lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile Screen Breakpoint (< 640px) */
+@media (max-width: 639px) {
+  html {
+    font-size: 15px;
+  }
+  
+  /* Ensure images never push viewport out of bounds */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prevent text selection when tapping navigation tabs */
+  .touch-pill {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* Tablet Screen Breakpoint (640px to 1023px) */
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* Tablet-specific container and touch target adjustments */
+  .tablet-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Desktop & Laptop Breakpoint (>= 1024px) */
+@media (min-width: 1024px) {
+  /* Desktop layout optimizations */
 }

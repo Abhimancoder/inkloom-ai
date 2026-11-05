@@ -70,16 +70,23 @@ router.post('/trigger-scan', async (req, res) => {
   try {
     const { assetName, channel, urlOrIdentifier, brandProfileName } = req.body
 
+    const issuesDetected = Math.random() > 0.6 ? 1 : 0
+    const complianceScore = issuesDetected
+      ? Math.floor(Math.random() * 15) + 70
+      : Math.floor(Math.random() * 15) + 85
+
     const scan = await MonitoringScan.create({
       assetName: assetName || 'Marketing Campaign Page Scan',
       channel: channel || 'Website Landing Page',
       urlOrIdentifier: urlOrIdentifier || 'https://brandproof.ai/campaign',
       brandProfileName: brandProfileName || 'Acme Corp',
-      complianceScore: Math.floor(Math.random() * 15) + 85, // 85-99%
-      issuesDetected: Math.random() > 0.6 ? 1 : 0,
-      status: 'Compliant',
+      complianceScore,
+      issuesDetected,
+      status: issuesDetected > 0 ? 'Warning' : 'Compliant',
       lastScannedAt: new Date(),
-      details: 'On-demand channel audit executed successfully. Brand assets verified against locked profile.'
+      details: issuesDetected > 0
+        ? 'On-demand channel audit completed with a compliance warning that requires review.'
+        : 'On-demand channel audit executed successfully. Brand assets verified against locked profile.'
     })
 
     await Alert.create({

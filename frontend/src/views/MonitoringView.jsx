@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Activity,
-  Globe,
   Radio,
   RefreshCw,
   AlertOctagon,
-  CheckCircle2,
-  Clock,
-  ArrowRight,
   ShieldCheck,
   Send,
-  ExternalLink,
   ChevronRight
 } from 'lucide-react'
-import { getMonitoringStats, getMonitoringAssets, getMonitoringActivity, triggerChannelScan } from '../services/api'
+import { getMonitoringStats, getMonitoringAssets, triggerChannelScan } from '../services/api'
 
 export default function MonitoringView() {
   const [stats, setStats] = useState({
@@ -26,23 +21,38 @@ export default function MonitoringView() {
     assetsMonitored: 124
   })
   const [assets, setAssets] = useState([])
-  const [activity, setActivity] = useState([])
   const [isScanning, setIsScanning] = useState(false)
   const [scanChannel, setScanChannel] = useState('Website Landing Page')
   const [scanAssetName, setScanAssetName] = useState('')
   const [scanUrl, setScanUrl] = useState('')
 
   const loadMonitoringData = async () => {
-    const s = await getMonitoringStats()
-    if (s) setStats(s)
-    const a = await getMonitoringAssets()
-    if (a) setAssets(a)
-    const act = await getMonitoringActivity()
-    if (act) setActivity(act)
+    const [nextStats, nextAssets] = await Promise.all([
+      getMonitoringStats(),
+      getMonitoringAssets()
+    ])
+    if (nextStats) setStats(nextStats)
+    if (nextAssets) setAssets(nextAssets)
   }
 
   useEffect(() => {
-    loadMonitoringData()
+    let isCurrent = true
+
+    async function loadInitialData() {
+      const [nextStats, nextAssets] = await Promise.all([
+        getMonitoringStats(),
+        getMonitoringAssets()
+      ])
+
+      if (!isCurrent) return
+      if (nextStats) setStats(nextStats)
+      if (nextAssets) setAssets(nextAssets)
+    }
+
+    void loadInitialData()
+    return () => {
+      isCurrent = false
+    }
   }, [])
 
   const handleRunScan = async (e) => {
@@ -303,7 +313,7 @@ export default function MonitoringView() {
                   </td>
                   <td className="px-4 sm:px-6 py-3.5 text-right text-xs">
                     <span className="text-gray-400 text-[11px]">
-                      {asset.criticalIssues || 0} crit · {asset.warnings || 0} warn
+                      {asset.issuesDetected || 0} issue{asset.issuesDetected === 1 ? '' : 's'} detected
                     </span>
                   </td>
                 </tr>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Send, FileEdit, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react'
+import { useState } from 'react'
+import { Send, AlertCircle, ArrowLeft } from 'lucide-react'
 
 export default function NewCheckView({
   brandProfiles,

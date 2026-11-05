@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   AlertOctagon,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight,
   Check,
   X,
   FileCheck2,

@@ -1,13 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
-  BookOpen,
-  Plus,
-  Trash2,
   CheckCircle,
-  AlertTriangle,
   Building2,
-  Save,
-  Tag
+  Save
 } from 'lucide-react'
 
 export default function BrandGuidelinesView({
@@ -121,7 +116,7 @@ export default function BrandGuidelinesView({
 
                 <span
                   className={`text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-semibold ${
-                    p.status === 'Active Locked'
+                    p.status === 'Active' || p.status === 'Active Locked'
                       ? 'bg-green-50 text-[#2E7D32] border border-green-200'
                       : 'bg-gray-100 text-gray-600'
                   }`}

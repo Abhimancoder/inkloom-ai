@@ -1,12 +1,9 @@
-import React from 'react'
 import {
   FileText,
   AlertOctagon,
   Clock,
   CheckCircle2,
   ArrowRight,
-  ExternalLink,
-  ShieldAlert,
   Sparkles,
   ChevronRight
 } from 'lucide-react'
@@ -46,13 +43,13 @@ export default function DashboardView({
 
       {/* 4 Metric KPI Cards (Responsive 1-col on mobile, 2-col on tablet, 4-col on desktop) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Scans Today */}
+        {/* Recorded Checks */}
         <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Scans Today</p>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#142B4A] mt-1">1,248</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recorded Checks</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#142B4A] mt-1">{totalChecks}</p>
             <span className="text-[11px] font-semibold text-[#2E7D32] mt-1 inline-flex items-center gap-1">
-              <span>↑</span> +18% vs yesterday
+              <span>Live</span> audit history
             </span>
           </div>
           <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-blue-50 text-[#142B4A] flex items-center justify-center shrink-0">
@@ -60,13 +57,13 @@ export default function DashboardView({
           </div>
         </div>
 
-        {/* Issues Detected */}
+        {/* Issues Found */}
         <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#C62828] uppercase tracking-wider">Issues Detected</p>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#C62828] mt-1">27</p>
+            <p className="text-xs font-semibold text-[#C62828] uppercase tracking-wider">Issues Found</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#C62828] mt-1">{issuesFound}</p>
             <span className="text-[11px] font-semibold text-[#2E7D32] mt-1 inline-flex items-center gap-1">
-              <span>↓</span> -32% vs yesterday
+              <span>{pendingReview}</span> awaiting review
             </span>
           </div>
           <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-red-50 text-[#C62828] flex items-center justify-center shrink-0">
@@ -74,13 +71,13 @@ export default function DashboardView({
           </div>
         </div>
 
-        {/* Approved % */}
+        {/* Approved */}
         <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-[#2E7D32] uppercase tracking-wider">Approved</p>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#2E7D32] mt-1">93%</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#2E7D32] mt-1">{approved}</p>
             <span className="text-[11px] font-semibold text-[#2E7D32] mt-1 inline-flex items-center gap-1">
-              <span>↑</span> +12% vs yesterday
+              <span>Ready</span> for publication
             </span>
           </div>
           <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-green-50 text-[#2E7D32] flex items-center justify-center shrink-0">

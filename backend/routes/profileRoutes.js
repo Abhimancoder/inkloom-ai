@@ -1,4 +1,5 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import { BrandProfile } from '../models/BrandProfile.js'
 
 const router = express.Router()
@@ -100,6 +101,9 @@ router.post('/', async (req, res) => {
 // PUT /api/profiles/:id - Update an existing brand profile
 router.put('/:id', async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, error: 'Profile ID is invalid' })
+    }
     const updated = await BrandProfile.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true

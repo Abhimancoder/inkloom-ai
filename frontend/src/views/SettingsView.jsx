@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
-  Settings,
   Database,
   Users,
   Shield,
-  Key,
-  Server,
-  CheckCircle2,
-  AlertCircle,
-  RefreshCw,
-  ExternalLink
+  RefreshCw
 } from 'lucide-react'
 import { checkBackendHealth } from '../services/api'
 
@@ -25,7 +19,17 @@ export default function SettingsView() {
   }
 
   useEffect(() => {
-    checkHealth()
+    let isCurrent = true
+
+    async function loadInitialHealth() {
+      const result = await checkBackendHealth()
+      if (isCurrent) setHealth(result)
+    }
+
+    void loadInitialHealth()
+    return () => {
+      isCurrent = false
+    }
   }, [])
 
   return (

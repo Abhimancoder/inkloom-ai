@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   CheckSquare,
   Check,
   RotateCcw,
   X,
   Clock,
-  User,
   AlertOctagon,
   AlertTriangle,
   MessageSquare

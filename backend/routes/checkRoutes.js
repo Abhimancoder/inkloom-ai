@@ -1,5 +1,6 @@
 import express from 'express'
 import axios from 'axios'
+import mongoose from 'mongoose'
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { BrandProfile } from '../models/BrandProfile.js'
@@ -29,7 +30,13 @@ router.post('/', async (req, res) => {
     // 1. Look up target brand profile
     let profile = null
     if (brandProfileId) {
+      if (!mongoose.isValidObjectId(brandProfileId)) {
+        return res.status(400).json({ success: false, error: 'brandProfileId must be a valid profile identifier' })
+      }
       profile = await BrandProfile.findById(brandProfileId)
+      if (!profile) {
+        return res.status(404).json({ success: false, error: 'Brand profile not found' })
+      }
     }
     if (!profile) {
       profile = await BrandProfile.findOne()
@@ -144,6 +151,9 @@ router.post('/', async (req, res) => {
 // GET /api/checks/:id - Get single check with findings and ML insights
 router.get('/:id', async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, error: 'Content check ID is invalid' })
+    }
     const check = await ContentCheck.findById(req.params.id)
     if (!check) {
       return res.status(404).json({ success: false, error: 'Content check not found' })

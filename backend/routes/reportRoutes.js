@@ -1,5 +1,6 @@
 import express from 'express'
 import axios from 'axios'
+import mongoose from 'mongoose'
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { ReviewDecision } from '../models/ReviewDecision.js'
@@ -88,6 +89,9 @@ router.get('/summary', async (req, res) => {
 // GET /api/reports/:checkId - Detailed audit-ready compliance certificate
 router.get('/:checkId', async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.checkId)) {
+      return res.status(400).json({ success: false, error: 'Content check ID is invalid' })
+    }
     const check = await ContentCheck.findById(req.params.checkId)
     if (!check) {
       return res.status(404).json({ success: false, error: 'Check not found' })

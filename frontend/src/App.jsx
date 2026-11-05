@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   Activity,
   PlusCircle,
   Search,
   BarChart3,
-  Layers,
-  CheckCircle2,
-  AlertTriangle
 } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
@@ -84,14 +81,15 @@ export default function App() {
   }, [])
 
   // 2. Submit Content Check via Backend API (Falls back to client engine if offline)
-  const handleAuditSubmit = async ({ title, channel, brandProfileId, brandProfileName, draftText }) => {
+  const handleAuditSubmit = async ({ title, channel, brandProfileId, draftText, visualAssets = [] }) => {
     try {
       const result = await submitContentCheck({
         title,
         channel,
         brandProfileId,
         submittedBy: 'Content Author (Current User)',
-        draftText
+        draftText,
+        visualAssets
       })
 
       if (result?.check && result?.findings) {
@@ -107,7 +105,7 @@ export default function App() {
           id: f._id || f.id
         }))
 
-        setChecks([savedCheck, ...checks])
+        setChecks((previousChecks) => [savedCheck, ...previousChecks])
         setFindings(savedFindings)
         setSelectedCheck(savedCheck)
 
@@ -125,7 +123,7 @@ export default function App() {
           status: 'Pending Decision',
           reviewerNotes: ''
         }
-        setReviewQueue([newQueueItem, ...reviewQueue])
+        setReviewQueue((previousQueue) => [newQueueItem, ...previousQueue])
         setCurrentView('findings')
         return
       }
@@ -204,7 +202,7 @@ export default function App() {
       draftText
     }
 
-    setChecks([newCheckRecord, ...checks])
+    setChecks((previousChecks) => [newCheckRecord, ...previousChecks])
     setFindings(newFindings)
     setSelectedCheck(newCheckRecord)
 
@@ -221,7 +219,7 @@ export default function App() {
       status: 'Pending Decision',
       reviewerNotes: ''
     }
-    setReviewQueue([newQueueItem, ...reviewQueue])
+    setReviewQueue((previousQueue) => [newQueueItem, ...previousQueue])
     setCurrentView('findings')
   }
 

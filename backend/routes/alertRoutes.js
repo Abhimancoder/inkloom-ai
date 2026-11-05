@@ -1,4 +1,5 @@
 ﻿import express from 'express'
+import mongoose from 'mongoose'
 import { Alert } from '../models/Alert.js'
 
 const router = express.Router()
@@ -40,7 +41,13 @@ router.get('/', async (req, res) => {
 // PUT /api/alerts/:id/read - Mark alert as read
 router.put('/:id/read', async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, error: 'Alert ID is invalid' })
+    }
     const alert = await Alert.findByIdAndUpdate(req.params.id, { read: true }, { new: true })
+    if (!alert) {
+      return res.status(404).json({ success: false, error: 'Alert not found' })
+    }
     res.status(200).json({ success: true, data: alert })
   } catch (error) {
     res.status(500).json({ success: false, error: error.message })

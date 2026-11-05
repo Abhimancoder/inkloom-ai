@@ -1,4 +1,5 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import { ReviewDecision } from '../models/ReviewDecision.js'
 import { ContentCheck } from '../models/ContentCheck.js'
 
@@ -29,6 +30,20 @@ router.post('/', async (req, res) => {
       })
     }
 
+    if (!mongoose.isValidObjectId(checkId)) {
+      return res.status(400).json({ success: false, error: 'checkId must be a valid content check identifier' })
+    }
+
+    const allowedDecisions = ['Approved', 'Changes Requested', 'Dismissed']
+    if (!allowedDecisions.includes(decision)) {
+      return res.status(400).json({ success: false, error: 'decision must be Approved, Changes Requested, or Dismissed' })
+    }
+
+    const check = await ContentCheck.findById(checkId)
+    if (!check) {
+      return res.status(404).json({ success: false, error: 'Content check not found' })
+    }
+
     // Save reviewer decision
     const newDecision = await ReviewDecision.create({
       checkId,
@@ -53,10 +68,9 @@ router.post('/', async (req, res) => {
       newStatusType = 'warning'
     }
 
-    await ContentCheck.findByIdAndUpdate(checkId, {
-      status: newStatus,
-      statusType: newStatusType
-    })
+    check.status = newStatus
+    check.statusType = newStatusType
+    await check.save()
 
     res.status(201).json({
       success: true,

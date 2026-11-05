@@ -2,7 +2,11 @@
 
 > **Hackathon 2026 Submission** | Built with React, Vite, Tailwind CSS, Express, MongoDB Atlas, and Python NLP.
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+🌐 **Live Deployed Product:** [https://inkloom-ai-snowy.vercel.app/](https://inkloom-ai-snowy.vercel.app/)  
+📁 **Public Source Code:** [https://github.com/Abhimancoder/inkloom-ai](https://github.com/Abhimancoder/inkloom-ai)
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-inkloom--ai--snowy.vercel.app-176B59?style=for-the-badge&logo=vercel)](https://inkloom-ai-snowy.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub_Repository-Abhimancoder%2Finkloom--ai-142B4A?style=for-the-badge&logo=github)](https://github.com/Abhimancoder/inkloom-ai)
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20Tailwind-142B4A)](https://github.com/Abhimancoder/inkloom-ai)
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-176B59)](https://github.com/Abhimancoder/inkloom-ai)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-2E7D32)](https://github.com/Abhimancoder/inkloom-ai)

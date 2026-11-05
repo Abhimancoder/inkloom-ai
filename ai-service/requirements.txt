@@ -1,0 +1,5 @@
+# Inkloom AI — Python NLP Service Dependencies
+# Note: main.py uses standard library (zero install needed to run!).
+# If using FastAPI/Uvicorn in production:
+fastapi>=0.110.0
+uvicorn>=0.28.0

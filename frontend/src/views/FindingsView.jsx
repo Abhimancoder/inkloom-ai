@@ -8,7 +8,8 @@ import {
   X,
   FileCheck2,
   Send,
-  ArrowLeft
+  ArrowLeft,
+  Download
 } from 'lucide-react'
 
 export default function FindingsView({
@@ -65,6 +66,41 @@ export default function FindingsView({
     )
   }
 
+  const handleExportReport = () => {
+    const reportData = {
+      platform: 'Inkloom AI — Intelligent Brand Governance Platform',
+      generatedAt: new Date().toISOString(),
+      contentTitle: currentCheck?.title || 'Brand Governance Audit',
+      brandProfile: currentCheck?.brandProfileName || 'TechCorp Enterprise',
+      channel: currentCheck?.channel || 'Email Marketing',
+      complianceSummary: {
+        criticalIssues: criticalCount,
+        warnings: warningCount,
+        passedChecks: passedCount,
+        overallStatus: criticalCount > 0 ? 'Action Required' : warningCount > 0 ? 'Needs Review' : 'Approved'
+      },
+      originalDraft: currentCheck?.draftText,
+      workingDraftWithAcceptedSuggestions: activeDraft,
+      findings: localFindings.map((f) => ({
+        severity: f.severity,
+        category: f.category,
+        excerpt: f.excerpt,
+        matchedRule: f.matchedRule,
+        explanation: f.explanation,
+        suggestedCorrection: f.suggestedCorrection,
+        status: f.status
+      }))
+    }
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Inkloom_Audit_Report_${(currentCheck?.title || 'Report').replace(/\s+/g, '_')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Top Header & Breadcrumbs */}
@@ -90,13 +126,24 @@ export default function FindingsView({
           </p>
         </div>
 
-        <button
-          onClick={() => onSendToReviewQueue(currentCheck, activeDraft)}
-          className="inline-flex items-center gap-2 bg-[#176B59] hover:bg-[#125345] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer self-start sm:self-auto"
-        >
-          <Send className="w-4 h-4" />
-          <span>Submit to Human Review Queue</span>
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <button
+            onClick={handleExportReport}
+            className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 text-[#142B4A] border border-gray-200 text-xs font-semibold px-3.5 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer"
+            title="Download complete compliance report as JSON"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export Report</span>
+          </button>
+
+          <button
+            onClick={() => onSendToReviewQueue(currentCheck, activeDraft)}
+            className="inline-flex items-center gap-2 bg-[#176B59] hover:bg-[#125345] text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-xs cursor-pointer"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>Send to Review Queue</span>
+          </button>
+        </div>
       </div>
 
       {/* Audit Summary Badges */}

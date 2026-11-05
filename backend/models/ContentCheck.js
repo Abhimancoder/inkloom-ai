@@ -82,7 +82,19 @@ const ContentCheckSchema = new mongoose.Schema(
       readingEaseScore: { type: Number, default: 65 },
       readabilityLabel: { type: String, default: 'Standard / Accessible' },
       wordCount: { type: Number, default: 0 },
-      sentenceCount: { type: Number, default: 0 }
+      sentenceCount: { type: Number, default: 0 },
+      shannonEntropy: { type: Number, default: 4.2 },
+      typeTokenRatio: { type: Number, default: 0.75 },
+      fleschKincaidGrade: { type: Number, default: 8.5 }
+    },
+    // Data Science & Machine Learning Enhancements
+    mlInsights: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    },
+    visualAnalytics: {
+      toneDistributionChart: { type: String, default: null },
+      sentenceDistributionChart: { type: String, default: null }
     }
   },
   {

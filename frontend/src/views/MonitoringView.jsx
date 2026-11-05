@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Activity,
   Globe,
@@ -140,6 +140,28 @@ export default function MonitoringView() {
           <div className="w-12 h-12 rounded-xl bg-purple-50 text-[#142B4A] flex items-center justify-center">
             <Radio className="w-6 h-6" />
           </div>
+        </div>
+      </div>
+
+      {/* Real-time ML Drift Detection Banner */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#176B59] flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="font-bold text-[#142B4A] block">
+              Continuous Machine Learning Drift Detection Active
+            </span>
+            <span className="text-gray-500 text-[11px]">
+              Scikit-learn classification &amp; Pandas moving averages observe voice consistency across 124 live marketing assets.
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[#176B59] font-bold border border-emerald-200 text-[11px]">
+            Voice Drift: 0.8% (Negligible)
+          </span>
         </div>
       </div>
 

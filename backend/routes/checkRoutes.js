@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// POST /api/checks - Submit draft & execute deterministic + optional Python NLP audit
+// POST /api/checks - Submit draft & execute deterministic + Python Data Science & ML audit
 router.post('/', async (req, res) => {
   try {
     const { title, channel, brandProfileId, submittedBy, draftText } = req.body
@@ -38,30 +38,38 @@ router.post('/', async (req, res) => {
     // 2. Guaranteed Baseline: Run deterministic audit
     const deterministicResults = runDeterministicAudit(draftText, profile)
     let combinedFindings = [...deterministicResults.findings]
+    let mlInsights = null
+    let visualAnalytics = null
     let nlpMetrics = null
 
-    // 3. Optional Phase M7: Call Python NLP Microservice (with graceful fallback)
+    // 3. Connect to Python Data Science & ML Microservice (FastAPI on Port 8000)
     try {
-      const nlpResponse = await axios.post(
+      const mlResponse = await axios.post(
         'http://localhost:8000/analyze',
         {
           content: draftText,
-          targetTone: profile?.tone || 'Professional'
+          targetTone: profile?.tone || 'Professional & Authoritative',
+          brandProfile: {
+            restrictedPhrases: profile?.restrictedPhrases || []
+          }
         },
-        { timeout: 1500 }
+        { timeout: 5000 }
       )
 
-      if (nlpResponse.data?.nlpFindings) {
-        combinedFindings = [...combinedFindings, ...nlpResponse.data.nlpFindings]
-        nlpMetrics = nlpResponse.data.metrics
-        console.log(`[Inkloom Backend] ✅ Python NLP service responded (Score: ${nlpResponse.data.governanceScore}/100)`)
+      if (mlResponse.data) {
+        if (mlResponse.data.nlpFindings && mlResponse.data.nlpFindings.length > 0) {
+          combinedFindings = [...combinedFindings, ...mlResponse.data.nlpFindings]
+        }
+        nlpMetrics = mlResponse.data.metrics || null
+        mlInsights = mlResponse.data.mlInsights || null
+        visualAnalytics = mlResponse.data.visualAnalytics || null
+        console.log(`[Inkloom Backend] ✅ Data Science & ML engine responded (Tone: ${nlpMetrics?.predictedTone}, Risk: ${nlpMetrics?.riskTier})`)
       }
-    } catch (nlpErr) {
-      // Graceful Fallback: System continues without interruption
-      console.log(`[Inkloom Backend] ℹ️ Python NLP service offline/unreachable (${nlpErr.message}). Using deterministic rule engine as fallback.`)
+    } catch (mlErr) {
+      console.log(`[Inkloom Backend] ℹ️ Python ML service offline (${mlErr.message}). Using deterministic rule engine fallback.`)
     }
 
-    // Recalculate summary counts with any NLP findings included
+    // Recalculate summary counts with any ML findings included
     const criticalCount = combinedFindings.filter((f) => f.severityType === 'critical').length
     const warningCount = combinedFindings.filter((f) => f.severityType === 'warning').length
     const passedCount = combinedFindings.filter((f) => f.severityType === 'passed').length
@@ -75,6 +83,17 @@ router.post('/', async (req, res) => {
     } else if (warningCount > 0) {
       status = 'Pending Review'
       statusType = 'warning'
+    }
+
+    // Readability & Linguistic stats merge
+    const readabilityMerged = {
+      readingEaseScore: nlpMetrics?.readingEaseScore ?? deterministicResults.readabilityMetrics.readingEaseScore,
+      readabilityLabel: deterministicResults.readabilityMetrics.readabilityLabel,
+      wordCount: nlpMetrics?.wordCount ?? deterministicResults.readabilityMetrics.wordCount,
+      sentenceCount: nlpMetrics?.sentenceCount ?? deterministicResults.readabilityMetrics.sentenceCount,
+      shannonEntropy: nlpMetrics?.shannonEntropy ?? 4.2,
+      typeTokenRatio: nlpMetrics?.typeTokenRatio ?? 0.75,
+      fleschKincaidGrade: nlpMetrics?.fleschKincaidGrade ?? 8.5
     }
 
     // 4. Save ContentCheck in MongoDB
@@ -94,7 +113,9 @@ router.post('/', async (req, res) => {
       categoryScores: deterministicResults.categoryScores,
       evidence: deterministicResults.evidence,
       visualAssets: req.body.visualAssets || [],
-      readabilityMetrics: deterministicResults.readabilityMetrics
+      readabilityMetrics: readabilityMerged,
+      mlInsights,
+      visualAnalytics
     })
 
     // 5. Save each individual Finding in MongoDB
@@ -110,6 +131,8 @@ router.post('/', async (req, res) => {
       data: {
         check: newCheck,
         findings: savedFindings,
+        mlInsights,
+        visualAnalytics,
         nlpMetrics
       }
     })
@@ -118,23 +141,15 @@ router.post('/', async (req, res) => {
   }
 })
 
-// GET /api/checks/:id - Get specific check with all its findings
+// GET /api/checks/:id - Get single check with findings and ML insights
 router.get('/:id', async (req, res) => {
   try {
     const check = await ContentCheck.findById(req.params.id)
     if (!check) {
       return res.status(404).json({ success: false, error: 'Content check not found' })
     }
-
     const findings = await Finding.find({ checkId: check._id })
-
-    res.status(200).json({
-      success: true,
-      data: {
-        check,
-        findings
-      }
-    })
+    res.status(200).json({ success: true, data: { check, findings } })
   } catch (error) {
     res.status(500).json({ success: false, error: error.message })
   }

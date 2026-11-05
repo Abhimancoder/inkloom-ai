@@ -70,7 +70,7 @@ export const getContentChecks = async () => {
 export const submitContentCheck = async (checkData) => {
   try {
     const response = await client.post('/checks', checkData)
-    return response.data?.data // Returns { check, findings }
+    return response.data?.data // Returns { check, findings, mlInsights, visualAnalytics }
   } catch (error) {
     console.error('[Inkloom API] Error submitting check to backend:', error.message)
     throw error
@@ -155,7 +155,7 @@ export const triggerChannelScan = async (scanData) => {
   }
 }
 
-// 6. Governance & Compliance Reports (Slide 6)
+// 6. Governance & Compliance Reports & Matplotlib Charts
 export const getReportsSummary = async () => {
   try {
     const response = await client.get('/reports/summary')
@@ -173,6 +173,16 @@ export const getReportCertificate = async (checkId) => {
   } catch (error) {
     console.error('[Inkloom API] Error fetching report certificate:', error.message)
     throw error
+  }
+}
+
+export const getVisualAnalyticsCharts = async () => {
+  try {
+    const response = await client.get('/reports/charts')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching visual analytics charts:', error.message)
+    return null
   }
 }
 

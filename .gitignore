@@ -1,0 +1,35 @@
+# ============================================
+# INKLOOM AI — .gitignore
+# ============================================
+# Files listed here are NEVER uploaded to GitHub
+
+# --- Secrets & Environment Variables ---
+# NEVER commit these — they contain passwords and API keys
+.env
+.env.local
+.env.production
+backend/.env
+
+# --- Node.js dependencies ---
+# These are auto-installed; no need to store them
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# --- Build output ---
+# Generated automatically; not source code
+frontend/dist/
+frontend/build/
+
+# --- Logs & Archives ---
+*.log
+npm-debug.log*
+*.zip
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Editor files ---
+.vscode/settings.json
+*.swp

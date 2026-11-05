@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-inkloom-navy: #142B4A;
+  --color-inkloom-green: #176B59;
+  --color-inkloom-bg: #F5F7FA;
+  --color-inkloom-card: #FFFFFF;
+  --color-inkloom-text: #202833;
+  --color-inkloom-critical: #C62828;
+  --color-inkloom-warning: #B7791F;
+  --color-inkloom-passed: #2E7D32;
+}
+
+body {
+  margin: 0;
+  background-color: #F5F7FA;
+  color: #202833;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}

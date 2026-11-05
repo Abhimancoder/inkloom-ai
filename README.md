@@ -17,4 +17,4 @@
 4-member beginner team — Hackathon project 2026
 
 ## Setup Instructions
-_Coming soon after MVP is complete._
+_Coming soon after MVP is complete.

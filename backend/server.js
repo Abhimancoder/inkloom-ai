@@ -1,8 +1,15 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
+import { connectDB } from './config/db.js'
 
-// Load environment variables
+// Route Imports
+import profileRoutes from './routes/profileRoutes.js'
+import checkRoutes from './routes/checkRoutes.js'
+import reviewRoutes from './routes/reviewRoutes.js'
+
+// Load environment variables from .env
 dotenv.config()
 
 const app = express()
@@ -12,18 +19,39 @@ const PORT = process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
 
+// Connect to MongoDB Atlas
+connectDB()
+
+// API Routes
+app.use('/api/profiles', profileRoutes)
+app.use('/api/checks', checkRoutes)
+app.use('/api/reviews', reviewRoutes)
+
 // Health Check Endpoint (Required by Phase M1)
 app.get('/api/health', (req, res) => {
+  const dbStatusMap = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  }
+
+  const dbState = mongoose.connection.readyState
+
   res.status(200).json({
     status: 'ok',
     service: 'inkloom-backend',
     version: '1.0.0',
     message: 'Inkloom AI Backend is healthy and running',
+    database: {
+      status: dbStatusMap[dbState] || 'unknown',
+      connected: dbState === 1
+    },
     timestamp: new Date().toISOString()
   })
 })
 
-// Fallback for unmatched routes
+// Fallback 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' })
 })
@@ -31,5 +59,8 @@ app.use((req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`[Inkloom Backend] Server running on http://localhost:${PORT}`)
-  console.log(`[Inkloom Backend] Health check available at http://localhost:${PORT}/api/health`)
+  console.log(`[Inkloom Backend] Health check at http://localhost:${PORT}/api/health`)
+  console.log(`[Inkloom Backend] Profiles API at http://localhost:${PORT}/api/profiles`)
+  console.log(`[Inkloom Backend] Checks API at http://localhost:${PORT}/api/checks`)
+  console.log(`[Inkloom Backend] Reviews API at http://localhost:${PORT}/api/reviews`)
 })

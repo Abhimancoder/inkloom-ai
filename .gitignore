@@ -21,6 +21,11 @@ backend/node_modules/
 frontend/dist/
 frontend/build/
 
+# --- Python cache ---
+__pycache__/
+*.py[cod]
+ai-service/__pycache__/
+
 # --- Logs & Archives ---
 *.log
 npm-debug.log*

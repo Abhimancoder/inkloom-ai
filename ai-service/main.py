@@ -61,9 +61,10 @@ def analyze_content(text, target_tone="Professional"):
 
     # Hype & Buzzword NLP pattern analysis
     hype_patterns = [
-        r'\b(miracle|revolutionary|revolutionary|disruptive|game-changing)\b',
-        r'\b(unprecedented|foolproof|guarantee|100%)\b',
-        r'\b(cheapest|lowest price|free money)\b'
+        r'\b(miracle|revolutionary|disruptive|game-changing)\b',
+        r'\b(unprecedented|foolproof|guarantee[a-z]*)\b',
+        r'(100\s*%)',
+        r'\b(cheap[a-z]*|lowest price|free money|best in class)\b'
     ]
 
     nlp_findings = []

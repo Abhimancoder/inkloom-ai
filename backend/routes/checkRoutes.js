@@ -1,5 +1,4 @@
 import express from 'express'
-import axios from 'axios'
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { BrandProfile } from '../models/BrandProfile.js'
@@ -42,23 +41,27 @@ router.post('/', async (req, res) => {
 
     // 3. Optional Phase M7: Call Python NLP Microservice (with graceful fallback)
     try {
-      const nlpResponse = await axios.post(
-        'http://localhost:8000/analyze',
-        {
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           content: draftText,
           targetTone: profile?.tone || 'Professional'
-        },
-        { timeout: 1500 }
-      )
+        }),
+        signal: AbortSignal.timeout(1500)
+      })
 
-      if (nlpResponse.data?.nlpFindings) {
-        combinedFindings = [...combinedFindings, ...nlpResponse.data.nlpFindings]
-        nlpMetrics = nlpResponse.data.metrics
-        console.log(`[Inkloom Backend] ✅ Python NLP service responded (Score: ${nlpResponse.data.governanceScore}/100)`)
+      if (response.ok) {
+        const nlpData = await response.json()
+        if (nlpData?.nlpFindings) {
+          combinedFindings = [...combinedFindings, ...nlpData.nlpFindings]
+          nlpMetrics = nlpData.metrics
+          console.log(`[Inkloom Backend] ✅ Python NLP service responded (Score: ${nlpData.governanceScore}/100)`)
+        }
       }
     } catch (nlpErr) {
       // Graceful Fallback: System continues without interruption
-      console.log(`[Inkloom Backend] ℹ️ Python NLP service offline/unreachable (${nlpErr.message}). Using deterministic rule engine as fallback.`)
+      console.log(`[Inkloom Backend] ℹ️ Python NLP service offline. Using deterministic rule engine as fallback.`)
     }
 
     // Recalculate summary counts with any NLP findings included

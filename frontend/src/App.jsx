@@ -70,16 +70,30 @@ export default function App() {
   }, [])
 
   // 2. Submit Content Check via Backend API (Falls back to client engine if offline)
-  const handleAuditSubmit = async ({ title, channel, brandProfileId, brandProfileName, draftText }) => {
+  const handleAuditSubmit = async ({ title, channel, brandProfileId, brandProfileName, draftText, assetFile }) => {
     try {
-      // Attempt backend API call (Phase M5 Axios integration)
-      const result = await submitContentCheck({
-        title,
-        channel,
-        brandProfileId,
-        submittedBy: 'Content Author (Current User)',
-        draftText
-      })
+      // Build payload: use FormData if an image asset is attached
+      let payload
+      if (assetFile) {
+        payload = new FormData()
+        payload.append('title', title || 'Untitled Content Check')
+        payload.append('channel', channel)
+        payload.append('brandProfileId', brandProfileId)
+        payload.append('submittedBy', 'Content Author (Current User)')
+        payload.append('draftText', draftText)
+        payload.append('asset', assetFile)
+      } else {
+        payload = {
+          title,
+          channel,
+          brandProfileId,
+          submittedBy: 'Content Author (Current User)',
+          draftText
+        }
+      }
+
+      // Attempt backend API call (Phase M5/M8 Axios integration)
+      const result = await submitContentCheck(payload)
 
       if (result?.check && result?.findings) {
         const savedCheck = {

@@ -1,9 +1,57 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { BrandProfile } from '../models/BrandProfile.js'
 import { runDeterministicAudit } from '../services/auditService.js'
+import { auditVisualAsset } from '../services/visualAuditService.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const uploadsDir = path.join(__dirname, '../uploads')
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true })
+}
+
+// ================================================================
+// SECURE MULTER UPLOAD CONFIGURATION (PHASE M8 / ROUND 3)
+// ================================================================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir)
+  },
+  filename: (req, file, cb) => {
+    // Generate safe, unguessable filename without path traversal risk
+    const ext = path.extname(file.originalname).toLowerCase()
+    const safeName = `asset-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`
+    cb(null, safeName)
+  }
+})
+
+const fileFilter = (req, file, cb) => {
+  const allowedMimes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
+  const ext = path.extname(file.originalname).toLowerCase()
+  const allowedExts = ['.png', '.jpg', '.jpeg', '.webp']
+
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+    cb(null, true)
+  } else {
+    cb(new Error('Unsupported file format. Please upload a PNG, JPG, or WEBP image asset.'))
+  }
+}
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB maximum limit
+  }
+})
 
 const router = express.Router()
 
@@ -17,8 +65,8 @@ router.get('/', async (req, res) => {
   }
 })
 
-// POST /api/checks - Submit draft & execute deterministic + optional Python NLP audit
-router.post('/', async (req, res) => {
+// POST /api/checks - Submit draft & execute unified text + visual audit
+router.post('/', upload.single('asset'), async (req, res) => {
   try {
     const { title, channel, brandProfileId, submittedBy, draftText } = req.body
 
@@ -26,7 +74,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Draft content text is required' })
     }
 
-    // 1. Look up target brand profile (safely handles custom or sample string IDs)
+    // 1. Look up target brand profile
     let profile = null
     if (brandProfileId && mongoose.isValidObjectId(brandProfileId)) {
       profile = await BrandProfile.findById(brandProfileId)
@@ -35,7 +83,7 @@ router.post('/', async (req, res) => {
       profile = await BrandProfile.findOne()
     }
 
-    // 2. Guaranteed Baseline: Run deterministic audit
+    // 2. Guaranteed Baseline: Run deterministic text audit
     const deterministicResults = runDeterministicAudit(draftText, profile)
     let combinedFindings = [...deterministicResults.findings]
     let nlpMetrics = null
@@ -61,11 +109,50 @@ router.post('/', async (req, res) => {
         }
       }
     } catch (nlpErr) {
-      // Graceful Fallback: System continues without interruption
       console.log(`[Inkloom Backend] ℹ️ Python NLP service offline. Using deterministic rule engine as fallback.`)
     }
 
-    // Recalculate summary counts with any NLP findings included
+    // 4. Round 3 Improvement 1: Multi-Modal Visual Asset Audit
+    let visualResult = null
+    let assetMetadata = {
+      assetUrl: null,
+      assetOriginalName: null,
+      assetMimeType: null,
+      assetSize: null,
+      assetColorPalette: [],
+      assetContrastRatio: null,
+      assetContrastPass: null
+    }
+
+    if (req.file) {
+      try {
+        console.log(`[Inkloom Backend] 🖼️ Analyzing uploaded visual asset: ${req.file.originalname}`)
+        visualResult = await auditVisualAsset(req.file.path, profile, {
+          originalName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          size: req.file.size
+        })
+
+        if (visualResult?.findings) {
+          combinedFindings = [...combinedFindings, ...visualResult.findings]
+        }
+
+        assetMetadata = {
+          assetUrl: `/uploads/${path.basename(req.file.path)}`,
+          assetOriginalName: req.file.originalname,
+          assetMimeType: req.file.mimetype,
+          assetSize: req.file.size,
+          assetColorPalette: visualResult?.extractedPalette || [],
+          assetContrastRatio: visualResult?.contrast?.ratio || null,
+          assetContrastPass: visualResult?.contrast?.passes ?? null
+        }
+        console.log(`[Inkloom Backend] ✅ Visual audit completed. Extracted ${visualResult?.extractedPalette?.length || 0} colors.`)
+      } catch (visErr) {
+        console.warn('[Inkloom Backend] Visual asset audit error:', visErr.message)
+      }
+    }
+
+    // Recalculate unified summary counts (text + visual)
     const criticalCount = combinedFindings.filter((f) => f.severityType === 'critical').length
     const warningCount = combinedFindings.filter((f) => f.severityType === 'warning').length
     const passedCount = combinedFindings.filter((f) => f.severityType === 'passed').length
@@ -81,7 +168,7 @@ router.post('/', async (req, res) => {
       statusType = 'warning'
     }
 
-    // 4. Save ContentCheck in MongoDB
+    // 5. Save ContentCheck in MongoDB
     const newCheck = await ContentCheck.create({
       title: title || 'Untitled Content Check',
       channel: channel || 'Email Marketing',
@@ -93,10 +180,11 @@ router.post('/', async (req, res) => {
       criticalCount,
       warningCount,
       passedCount,
-      draftText
+      draftText,
+      ...assetMetadata
     })
 
-    // 5. Save each individual Finding in MongoDB
+    // 6. Save each individual Finding in MongoDB
     const findingsWithCheckId = combinedFindings.map((f) => ({
       ...f,
       checkId: newCheck._id
@@ -109,7 +197,8 @@ router.post('/', async (req, res) => {
       data: {
         check: newCheck,
         findings: savedFindings,
-        nlpMetrics
+        nlpMetrics,
+        visualAnalysis: visualResult
       }
     })
   } catch (error) {

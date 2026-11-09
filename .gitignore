@@ -35,6 +35,10 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# --- Uploads & Temporary Media ---
+backend/uploads/
+uploads/
+
 # --- Editor files ---
 .vscode/settings.json
 *.swp

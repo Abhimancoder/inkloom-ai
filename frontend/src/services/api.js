@@ -69,8 +69,10 @@ export const getContentChecks = async () => {
 
 export const submitContentCheck = async (checkData) => {
   try {
-    const response = await client.post('/checks', checkData)
-    return response.data?.data // Returns { check, findings }
+    const isFormData = typeof FormData !== 'undefined' && checkData instanceof FormData
+    const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
+    const response = await client.post('/checks', checkData, { headers })
+    return response.data?.data // Returns { check, findings, visualAnalysis }
   } catch (error) {
     console.error('[Inkloom API] Error submitting check to backend:', error.message)
     throw error

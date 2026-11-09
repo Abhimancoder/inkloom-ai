@@ -50,6 +50,35 @@ const ContentCheckSchema = new mongoose.Schema(
     draftText: {
       type: String,
       required: [true, 'Draft content text is required']
+    },
+    // Round 3 Improvement 1: Multi-Modal Visual Asset Metadata
+    assetUrl: {
+      type: String,
+      default: null
+    },
+    assetOriginalName: {
+      type: String,
+      default: null
+    },
+    assetMimeType: {
+      type: String,
+      default: null
+    },
+    assetSize: {
+      type: Number,
+      default: null
+    },
+    assetColorPalette: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: []
+    },
+    assetContrastRatio: {
+      type: Number,
+      default: null
+    },
+    assetContrastPass: {
+      type: Boolean,
+      default: null
     }
   },
   {

@@ -9,7 +9,8 @@ import {
   BarChart3,
   Settings,
   Globe,
-  ShieldCheck
+  ShieldCheck,
+  BookmarkCheck
 } from 'lucide-react'
 
 export default function Sidebar({ currentView, setCurrentView, pendingReviewCount = 2 }) {
@@ -17,6 +18,7 @@ export default function Sidebar({ currentView, setCurrentView, pendingReviewCoun
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'new-check', label: 'New Content Check', icon: PlusCircle },
     { id: 'brand-guidelines', label: 'Brand Guidelines', icon: BookOpen },
+    { id: 'approved-copy', label: 'Approved Copy', icon: BookmarkCheck },
     { id: 'findings', label: 'Findings', icon: Search, badge: '2 Issues' },
     { id: 'review-queue', label: 'Review Queue', icon: CheckSquare, badgeCount: pendingReviewCount },
     { id: 'history', label: 'History & Logs', icon: History },
@@ -88,7 +90,7 @@ export default function Sidebar({ currentView, setCurrentView, pendingReviewCoun
           <span>View Public Landing Page</span>
         </button>
         <p className="text-[10px] text-center text-white/40 mt-3">
-          Inkloom AI Studio · v1.0 MVP
+          Inkloom AI Studio · v3.0 Multi-Modal
         </p>
       </div>
     </aside>

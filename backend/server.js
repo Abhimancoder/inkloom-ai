@@ -11,6 +11,8 @@ import { connectDB } from './config/db.js'
 import profileRoutes from './routes/profileRoutes.js'
 import checkRoutes from './routes/checkRoutes.js'
 import reviewRoutes from './routes/reviewRoutes.js'
+import approvedCopyRoutes from './routes/approvedCopyRoutes.js'
+import rewriteRoutes from './routes/rewriteRoutes.js'
 
 // Load environment variables from .env
 dotenv.config()
@@ -41,6 +43,8 @@ connectDB()
 app.use('/api/profiles', profileRoutes)
 app.use('/api/checks', checkRoutes)
 app.use('/api/reviews', reviewRoutes)
+app.use('/api/approved-copy', approvedCopyRoutes)
+app.use('/api/rewrites', rewriteRoutes)
 
 // Health Check Endpoint (Required by Phase M1)
 app.get('/api/health', (req, res) => {
@@ -78,4 +82,6 @@ app.listen(PORT, () => {
   console.log(`[Inkloom Backend] Profiles API at http://localhost:${PORT}/api/profiles`)
   console.log(`[Inkloom Backend] Checks API at http://localhost:${PORT}/api/checks`)
   console.log(`[Inkloom Backend] Reviews API at http://localhost:${PORT}/api/reviews`)
+  console.log(`[Inkloom Backend] Approved Copy API at http://localhost:${PORT}/api/approved-copy`)
+  console.log(`[Inkloom Backend] RAG Rewrites API at http://localhost:${PORT}/api/rewrites/generate`)
 })

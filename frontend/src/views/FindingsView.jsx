@@ -16,8 +16,12 @@ import {
   ShieldCheck,
   Layers,
   Sparkles,
-  SunMedium
+  SunMedium,
+  BookmarkCheck,
+  TrendingUp,
+  RotateCcw
 } from 'lucide-react'
+import { generateRagRewrite } from '../services/api'
 
 export default function FindingsView({
   currentCheck,
@@ -31,6 +35,12 @@ export default function FindingsView({
       'TechCorp Solutions provides an enterprise-grade governance platform. We are offering the best in class solution at cheap rates to all new customers, guaranteed to eliminate 100% of errors.'
   )
   const [acceptedCount, setAcceptedCount] = useState(0)
+
+  // RAG Rewrite Modal State
+  const [isRagModalOpen, setIsRagModalOpen] = useState(false)
+  const [isGeneratingRewrite, setIsGeneratingRewrite] = useState(false)
+  const [ragResult, setRagResult] = useState(null)
+  const [activeFindingForRewrite, setActiveFindingForRewrite] = useState(null)
 
   // Sync localFindings and draft text when parent sends new data (fresh audit run)
   useEffect(() => {
@@ -57,7 +67,6 @@ export default function FindingsView({
   const handleAcceptSuggestion = (finding) => {
     if (!finding.suggestedCorrection) return
 
-    // Apply suggestion: use the excerpt text to find and replace in the draft
     let updated = activeDraft
     const rawExcerpt = finding.excerpt
       ? finding.excerpt.replace(/^\.\.\./, '').replace(/\.\.\.$/, '').trim()
@@ -71,12 +80,42 @@ export default function FindingsView({
     setActiveDraft(updated)
     setAcceptedCount((c) => c + 1)
 
-    // Mark finding as accepted
     setLocalFindings((prev) =>
       prev.map((f) =>
         f.id === finding.id ? { ...f, status: 'Suggestion Accepted' } : f
       )
     )
+  }
+
+  const handleOpenRagRewrite = async (finding) => {
+    setActiveFindingForRewrite(finding)
+    setIsGeneratingRewrite(true)
+    setIsRagModalOpen(true)
+
+    const result = await generateRagRewrite({
+      originalSentence: activeDraft,
+      brandProfileId: currentCheck?.brandProfileId,
+      matchedRule: finding.matchedRule,
+      explanation: finding.explanation
+    })
+
+    setRagResult(result)
+    setIsGeneratingRewrite(false)
+  }
+
+  const handleApplyRagSuggestion = () => {
+    if (!ragResult?.suggestedAlternative) return
+    setActiveDraft(ragResult.suggestedAlternative)
+    setAcceptedCount((c) => c + 1)
+    if (activeFindingForRewrite) {
+      const targetId = activeFindingForRewrite.id || activeFindingForRewrite._id
+      setLocalFindings((prev) =>
+        prev.map((f) =>
+          (f.id === targetId || f._id === targetId) ? { ...f, status: 'Suggestion Accepted' } : f
+        )
+      )
+    }
+    setIsRagModalOpen(false)
   }
 
   const handleDismissFinding = (findingId) => {
@@ -90,7 +129,7 @@ export default function FindingsView({
   const handleExportReport = () => {
     const reportData = {
       platform: 'Inkloom AI — Intelligent Brand Governance Platform',
-      version: '3.0.0 (Round 3 Multi-Modal)',
+      version: '3.0.0 (Round 3 Multi-Modal & RAG)',
       generatedAt: new Date().toISOString(),
       contentTitle: currentCheck?.title || 'Brand Governance Audit',
       brandProfile: currentCheck?.brandProfileName || 'TechCorp Enterprise',
@@ -202,7 +241,7 @@ export default function FindingsView({
         {hasVisualAsset && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#176B59] border border-teal-200">
             <Palette className="w-3.5 h-3.5" />
-            Multi-Modal Visual Audited
+            Visual Audited
           </span>
         )}
         {acceptedCount > 0 && (
@@ -213,7 +252,7 @@ export default function FindingsView({
         )}
       </div>
 
-      {/* Round 3 Improvement 1: Multi-Modal Visual Asset Inspection Card */}
+      {/* Visual Asset Overview Card (Improvement 1) */}
       {hasVisualAsset && (
         <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -229,7 +268,6 @@ export default function FindingsView({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            {/* Asset Preview Thumbnail */}
             <div className="space-y-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Audited Graphic:
@@ -241,9 +279,8 @@ export default function FindingsView({
                     alt="Audited Visual"
                     className="w-full h-44 object-contain"
                     onError={(e) => {
-                      // Fallback if local server path differs
                       e.target.style.display = 'none'
-                      e.target.nextSibling.style.display = 'flex'
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'
                     }}
                   />
                 ) : null}
@@ -254,7 +291,6 @@ export default function FindingsView({
               </div>
             </div>
 
-            {/* Extracted Dominant Color Swatches */}
             <div className="space-y-2 md:col-span-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Dominant Extracted HEX Swatches & Brand Alignment:
@@ -288,7 +324,6 @@ export default function FindingsView({
                 ))}
               </div>
 
-              {/* Contrast Quick Metric */}
               <div className="mt-3 p-3 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
                 <span className="text-gray-600 font-medium flex items-center gap-1.5">
                   <SunMedium className="w-4 h-4 text-[#176B59]" />
@@ -433,8 +468,19 @@ export default function FindingsView({
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+              {/* Action Buttons: Includes Round 3 Contextual RAG Rewrite */}
+              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-4 border-t border-gray-100">
+                {!isVisualFinding && (
+                  <button
+                    onClick={() => handleOpenRagRewrite(finding)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#176B59] text-[#176B59] hover:bg-teal-50 transition-colors cursor-pointer shadow-2xs"
+                    title="Generate complete context-aware paragraph alternative using Approved Copy Library"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#176B59]" />
+                    <span>Contextual RAG Rewrite</span>
+                  </button>
+                )}
+
                 {finding.status !== 'Suggestion Accepted' && finding.suggestedCorrection && !isVisualFinding && (
                   <button
                     onClick={() => handleAcceptSuggestion(finding)}
@@ -444,6 +490,7 @@ export default function FindingsView({
                     <span>Accept Suggestion</span>
                   </button>
                 )}
+
                 {finding.status !== 'Dismissed by User' && (
                   <button
                     onClick={() => handleDismissFinding(finding.id || finding._id)}
@@ -458,6 +505,140 @@ export default function FindingsView({
           )
         })}
       </div>
+
+      {/* Round 3 Improvement 2: Contextual RAG Rewrite Modal */}
+      {isRagModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-2xl w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#176B59]" />
+                <h3 className="text-base font-bold text-[#142B4A]">Contextual RAG Alternative Generator</h3>
+              </div>
+              <button
+                onClick={() => setIsRagModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {isGeneratingRewrite ? (
+              <div className="py-12 text-center space-y-3">
+                <span className="animate-spin text-3xl inline-block">⚙️</span>
+                <p className="text-sm font-semibold text-[#142B4A]">
+                  Retrieving Approved Brand Library Proof & Synthesizing Contextual Alternative...
+                </p>
+                <p className="text-xs text-gray-400">
+                  Enforcing strict fact, number, and compliance disclaimer preservation.
+                </p>
+              </div>
+            ) : ragResult ? (
+              <div className="space-y-4 text-xs">
+                {/* Notice pill */}
+                <div className="p-3 rounded-lg bg-teal-50 border border-teal-200 text-[#176B59] flex items-center gap-2 font-medium">
+                  <BookmarkCheck className="w-4 h-4 shrink-0" />
+                  <span>{ragResult.notice}</span>
+                </div>
+
+                {/* Side-by-side comparison */}
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-semibold text-gray-400 uppercase tracking-wider block mb-1">
+                      Current Draft Copy:
+                    </span>
+                    <div className="p-3.5 rounded-lg bg-red-50/60 border border-red-200 text-sm text-[#202833] line-through opacity-80">
+                      {ragResult.originalSentence}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-semibold text-[#176B59] uppercase tracking-wider block mb-1 flex items-center justify-between">
+                      <span>AI Suggested Contextual Alternative:</span>
+                      <span className="text-[10px] bg-green-100 text-[#2E7D32] px-2 py-0.5 rounded-full font-bold">
+                        Full Contextual Replacement
+                      </span>
+                    </span>
+                    <div className="p-3.5 rounded-lg bg-green-50/80 border border-green-200 text-sm font-medium text-[#142B4A] leading-relaxed">
+                      {ragResult.suggestedAlternative}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preserved Factual Constraints */}
+                {ragResult.preservedFacts?.length > 0 && (
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
+                      Preserved Factual Constraints (Numbers, % & Claims):
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {ragResult.preservedFacts.map((fact, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-white border border-gray-200 text-gray-700 px-2 py-0.5 rounded font-mono text-[11px] font-bold"
+                        >
+                          ✓ {fact}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Retrieved Approved Brand Evidence */}
+                {ragResult.retrievedSources?.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
+                      Retrieved Brand Proof Evidence (From Approved Library):
+                    </span>
+                    <div className="space-y-2">
+                      {ragResult.retrievedSources.map((source, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-[11px] space-y-1"
+                        >
+                          <div className="flex items-center justify-between font-bold text-[#142B4A]">
+                            <span>{source.title} ({source.channel})</span>
+                            <span className="text-[#176B59] font-mono">{source.similarityScore}% Match</span>
+                          </div>
+                          <p className="text-gray-600 italic">"{source.snippet}"</p>
+                          <p className="text-[10px] text-gray-400">Evidence: {source.relevanceReason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Explanation */}
+                <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                  <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                    Why This Addresses Brand Governance:
+                  </span>
+                  <p className="text-gray-700 leading-relaxed">{ragResult.explanation}</p>
+                </div>
+
+                {/* Action footer */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsRagModalOpen(false)}
+                    className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Keep Original
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleApplyRagSuggestion}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white shadow-xs cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Apply Suggestion to Working Draft</span>
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

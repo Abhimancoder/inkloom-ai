@@ -7,6 +7,7 @@ import FindingsView from './views/FindingsView'
 import BrandGuidelinesView from './views/BrandGuidelinesView'
 import ReviewQueueView from './views/ReviewQueueView'
 import LandingPageView from './views/LandingPageView'
+import ApprovedCopyView from './views/ApprovedCopyView'
 
 import {
   SAMPLE_BRAND_PROFILES,
@@ -288,6 +289,7 @@ export default function App() {
     dashboard: { title: 'Studio Dashboard', subtitle: 'Real-time overview of content governance and recent reviews' },
     'new-check': { title: 'New Content Check', subtitle: 'Submit marketing copy or draft for automated inspection' },
     'brand-guidelines': { title: 'Brand Guidelines', subtitle: 'Maintain approved voice, restricted terminology and claims' },
+    'approved-copy': { title: 'Approved Copy Library', subtitle: 'Gold-standard verified brand messaging corpus used for RAG re-writing' },
     findings: { title: 'Audit Findings', subtitle: 'Structured evidence, matched rules and suggested corrections' },
     'review-queue': { title: 'Review Queue', subtitle: 'Human reviewer approval gate before content publication' },
     history: { title: 'Audit History & Logs', subtitle: 'Historical record of content checks and reviewer decisions' },
@@ -352,6 +354,10 @@ export default function App() {
               brandProfiles={brandProfiles}
               onSaveProfile={handleSaveProfile}
             />
+          )}
+
+          {currentView === 'approved-copy' && (
+            <ApprovedCopyView brandProfiles={brandProfiles} />
           )}
 
           {currentView === 'review-queue' && (

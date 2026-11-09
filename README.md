@@ -176,10 +176,8 @@ npm run dev
 
 ---
 
-<<<<<<< HEAD
 ## 👥 Team & Participant Details (CodeNexus Hackathon)
-* **Team Name:** `aryanmishra4551` | **Team ID:** `4565`
-* **College:** Shri Ramswaroop Memorial University (Department of Computer Science)
+* **Team Name:** ryanmishra4551 | **Team ID:** %65\n* **College:** Shri Ramswaroop Memorial University (Department of Computer Science)
 * **Aryan Mishra (Team Leader):** Frontend & Full-Stack Developer. Dashboard, upload interface, findings, reports, and component integration.
 * **Pranav Sharma (Participant 2):** Backend & AI Developer. Express REST APIs, Mongoose data models, MongoDB persistence, and Python NLP microservice.
 * **Labeeba Khan (Participant 3):** Research & Documentation Lead. Problem statement validation, testing, brand governance compliance rules, and pitch presentation.
@@ -190,11 +188,5 @@ npm run dev
 ## ⚖️ Safety, Privacy & Honest AI Principles
 * **Evidence Before Claims:** Every flagged issue displays the exact surrounding excerpt and cited guideline.
 * **Deterministic Baseline:** Restricted buzzwords and mandatory brand names are validated deterministically first. If the Python AI service is unreachable, the system gracefully falls back to deterministic checks with zero user disruption.
-* **Zero Secret Leaks:** All database credentials and private tokens are isolated in server `.env` files and strictly excluded from version control.
+* **Zero Secret Leaks:** All database credentials and private tokens are isolated in server .env files and strictly excluded from version control.
 * **Human in the Loop:** Inkloom AI provides decision assistance, not automated publishing.
-=======
-## 👥 Team Roles & Contributions
-* **Abhiman Singh (UI/UX & Product Lead):** End-to-end user journey design, multi-modal findings UX, RAG comparison drawer, review queue workflow, design system adhering to locked Inkloom Studio colors.
-* **Member 2 (Frontend Developer):** React 19 component architecture, Axios API integration, visual asset uploader, Approved Copy Library view, and live webhook status UI.
-* **Pranav Sharma (Backend & AI Developer):** Express REST endpoints, MongoDB Mongoose schemas, WCAG contrast calculation service, RAG keyword-retrieval engine, and webhook dispatcher.
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc

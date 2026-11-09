@@ -56,7 +56,7 @@ export const updateBrandProfile = async (id, profileData) => {
   }
 }
 
-// 3. Content Checks & Deterministic Audit
+// 3. Content Checks & Audit
 export const getContentChecks = async () => {
   try {
     const response = await client.get('/checks')
@@ -69,15 +69,10 @@ export const getContentChecks = async () => {
 
 export const submitContentCheck = async (checkData) => {
   try {
-<<<<<<< HEAD
-    const response = await client.post('/checks', checkData)
-    return response.data?.data // Returns { check, findings, mlInsights, visualAnalytics }
-=======
     const isFormData = typeof FormData !== 'undefined' && checkData instanceof FormData
     const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
     const response = await client.post('/checks', checkData, { headers })
-    return response.data?.data // Returns { check, findings, visualAnalysis }
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+    return response.data?.data // Returns { check, findings, mlInsights, visualAnalytics, visualAnalysis }
   } catch (error) {
     console.error('[Inkloom API] Error submitting check to backend:', error.message)
     throw error
@@ -121,18 +116,7 @@ export const getReviewDecisions = async () => {
   }
 }
 
-<<<<<<< HEAD
-// 5. Continuous Channel Monitoring (Slide 4 & 5)
-export const getMonitoringStats = async () => {
-  try {
-    const response = await client.get('/monitoring/stats')
-    return response.data?.data
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching monitoring stats:', error.message)
-=======
-// ================================================================
 // 5. Approved Copy Library & Contextual RAG Rewriting (Round 3)
-// ================================================================
 export const getApprovedCopy = async (brandProfileId) => {
   try {
     const params = brandProfileId ? { brandProfileId } : {}
@@ -140,112 +124,30 @@ export const getApprovedCopy = async (brandProfileId) => {
     return response.data?.data || []
   } catch (error) {
     console.warn('[Inkloom API] Approved copy fetch offline fallback:', error.message)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     return null
   }
 }
 
-<<<<<<< HEAD
-export const getMonitoringAssets = async () => {
-  try {
-    const response = await client.get('/monitoring/assets')
-    return response.data?.data || []
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching monitoring assets:', error.message)
-    return []
-  }
-}
-
-export const getMonitoringActivity = async () => {
-  try {
-    const response = await client.get('/monitoring/activity')
-    return response.data?.data || []
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching monitoring activity:', error.message)
-    return []
-  }
-}
-
-export const triggerChannelScan = async (scanData) => {
-  try {
-    const response = await client.post('/monitoring/trigger-scan', scanData)
-    return response.data?.data
-  } catch (error) {
-    console.error('[Inkloom API] Error triggering channel scan:', error.message)
-=======
 export const createApprovedCopy = async (copyData) => {
   try {
     const response = await client.post('/approved-copy', copyData)
     return response.data?.data
   } catch (error) {
     console.error('[Inkloom API] Error creating approved copy:', error.message)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     throw error
   }
 }
 
-<<<<<<< HEAD
-// 6. Governance & Compliance Reports & Matplotlib Charts
-export const getReportsSummary = async () => {
-  try {
-    const response = await client.get('/reports/summary')
-    return response.data?.data
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching reports summary:', error.message)
-    return null
-  }
-}
-
-export const getReportCertificate = async (checkId) => {
-  try {
-    const response = await client.get(`/reports/${checkId}`)
-    return response.data?.data
-  } catch (error) {
-    console.error('[Inkloom API] Error fetching report certificate:', error.message)
-=======
 export const deleteApprovedCopy = async (id) => {
   try {
     const response = await client.delete(`/approved-copy/${id}`)
     return response.data
   } catch (error) {
     console.error('[Inkloom API] Error deleting approved copy:', error.message)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     throw error
   }
 }
 
-<<<<<<< HEAD
-export const getVisualAnalyticsCharts = async () => {
-  try {
-    const response = await client.get('/reports/charts')
-    return response.data?.data
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching visual analytics charts:', error.message)
-    return null
-  }
-}
-
-// 7. Proactive Alerts & Activity Stream (Slide 4)
-export const getAlerts = async () => {
-  try {
-    const response = await client.get('/alerts')
-    return response.data?.data || []
-  } catch (error) {
-    console.warn('[Inkloom API] Error fetching alerts:', error.message)
-    return []
-  }
-}
-
-export const markAlertRead = async (id) => {
-  try {
-    const response = await client.put(`/alerts/${id}/read`)
-    return response.data?.data
-  } catch (error) {
-    console.warn('[Inkloom API] Error marking alert read:', error.message)
-    return null
-  }
-}
-=======
 export const generateRagRewrite = async ({
   originalSentence,
   brandProfileId,
@@ -290,9 +192,8 @@ export const generateRagRewrite = async ({
     }
   }
 }
-// ================================================================
+
 // 6. Headless CMS & Collaboration Webhooks (Round 3)
-// ================================================================
 export const getIntegrations = async () => {
   try {
     const response = await client.get('/integrations')
@@ -353,4 +254,96 @@ export const getIntegrationEvents = async () => {
     return []
   }
 }
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+
+// 7. Continuous Channel Monitoring (Slide 4 & 5)
+export const getMonitoringStats = async () => {
+  try {
+    const response = await client.get('/monitoring/stats')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring stats:', error.message)
+    return null
+  }
+}
+
+export const getMonitoringAssets = async () => {
+  try {
+    const response = await client.get('/monitoring/assets')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring assets:', error.message)
+    return []
+  }
+}
+
+export const getMonitoringActivity = async () => {
+  try {
+    const response = await client.get('/monitoring/activity')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching monitoring activity:', error.message)
+    return []
+  }
+}
+
+export const triggerChannelScan = async (scanData) => {
+  try {
+    const response = await client.post('/monitoring/trigger-scan', scanData)
+    return response.data?.data
+  } catch (error) {
+    console.error('[Inkloom API] Error triggering channel scan:', error.message)
+    throw error
+  }
+}
+
+// 8. Governance & Compliance Reports & Matplotlib Charts
+export const getReportsSummary = async () => {
+  try {
+    const response = await client.get('/reports/summary')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching reports summary:', error.message)
+    return null
+  }
+}
+
+export const getReportCertificate = async (checkId) => {
+  try {
+    const response = await client.get(`/reports/${checkId}`)
+    return response.data?.data
+  } catch (error) {
+    console.error('[Inkloom API] Error fetching report certificate:', error.message)
+    throw error
+  }
+}
+
+export const getVisualAnalyticsCharts = async () => {
+  try {
+    const response = await client.get('/reports/charts')
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching visual analytics charts:', error.message)
+    return null
+  }
+}
+
+// 9. Proactive Alerts & Activity Stream (Slide 4)
+export const getAlerts = async () => {
+  try {
+    const response = await client.get('/alerts')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Error fetching alerts:', error.message)
+    return []
+  }
+}
+
+export const markAlertRead = async (id) => {
+  try {
+    const response = await client.put(`/alerts/${id}/read`)
+    return response.data?.data
+  } catch (error) {
+    console.warn('[Inkloom API] Error marking alert read:', error.message)
+    return null
+  }
+}

@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import { useState } from 'react'
-import { Send, AlertCircle, ArrowLeft } from 'lucide-react'
-=======
 import React, { useState, useEffect } from 'react'
 import {
   Send,
@@ -15,7 +11,6 @@ import {
   CheckCircle2,
   Palette
 } from 'lucide-react'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
 export default function NewCheckView({
   brandProfiles,
@@ -33,9 +28,6 @@ export default function NewCheckView({
   )
   const [isAuditing, setIsAuditing] = useState(false)
 
-<<<<<<< HEAD
-  // Sample quick-fill drafts for instant hackathon demonstration
-=======
   // Round 3 Improvement 1: Visual Asset Upload State
   const [assetFile, setAssetFile] = useState(null)
   const [assetPreview, setAssetPreview] = useState(null)
@@ -87,7 +79,6 @@ export default function NewCheckView({
   }
 
   // Sample quick-fill draft for instant hackathon demonstration
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
   const handleLoadSampleDraft = () => {
     setTitle('Acme Q4 Enterprise Marketing Campaign')
     setChannel('Email Marketing')
@@ -121,21 +112,6 @@ export default function NewCheckView({
 
     setIsAuditing(true)
 
-<<<<<<< HEAD
-    // Run deterministic + backend audit processing
-    setTimeout(() => {
-      const selectedProfile = brandProfiles.find((p) => p.id === selectedProfileId)
-      onSubmitCheck({
-        title: title || 'Untitled Content Draft',
-        channel,
-        brandProfileId: selectedProfileId,
-        brandProfileName: selectedProfile?.name || 'Acme Corp',
-        draftText,
-        visualAssets: visualAsset ? [{ fileName: visualAsset, url: `/assets/${visualAsset}`, caption: 'Ad Creative Asset', complianceStatus: 'Compliant' }] : []
-      })
-      setIsAuditing(false)
-    }, 700)
-=======
     const selectedProfile = brandProfiles.find((p) => p.id === selectedProfileId)
     onSubmitCheck({
       title: title || 'Untitled Content Draft',
@@ -146,7 +122,6 @@ export default function NewCheckView({
       assetFile
     })
     setIsAuditing(false)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
   }
 
   return (
@@ -161,15 +136,9 @@ export default function NewCheckView({
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Dashboard</span>
           </button>
-<<<<<<< HEAD
           <h2 className="text-xl sm:text-2xl font-bold text-[#142B4A]">Submit Content for Brand Review</h2>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-            Check marketing copy, emails, or social posts against approved brand guidelines before publication.
-=======
-          <h2 className="text-2xl font-bold text-[#142B4A]">Submit Content for Brand Review</h2>
-          <p className="text-sm text-gray-500">
             Check marketing copy and visual graphics against approved brand guidelines before publication.
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </p>
         </div>
 
@@ -239,43 +208,7 @@ export default function NewCheckView({
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Row 2: Brand Profile Selector & Supported Visual Asset (Slide 5) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-              Target Brand Profile
-            </label>
-            <select
-              value={selectedProfileId}
-              onChange={(e) => setSelectedProfileId(e.target.value)}
-              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] bg-white font-medium"
-            >
-              {brandProfiles.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.industry}) · {p.ruleCount} Rules Active
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-              Supported Visual Asset Attachment (Slide 5)
-            </label>
-            <select
-              value={visualAsset}
-              onChange={(e) => setVisualAsset(e.target.value)}
-              className="w-full px-3.5 py-2 sm:py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] bg-white font-mono"
-            >
-              <option value="peltz.jpg">peltz.jpg (Instagram Story &amp; Banner Creative)</option>
-              <option value="acme-logo.svg">acme-logo.svg (Vector Brand Logo)</option>
-              <option value="security-badge.svg">security-badge.svg (SOC-2 Compliance Badge)</option>
-              <option value="">None (Text-only audit)</option>
-            </select>
-          </div>
-=======
-        {/* Row 2: Brand Profile Selector */}
+        {/* Row 2: Target Brand Profile */}
         <div>
           <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
             Target Brand Profile
@@ -291,7 +224,6 @@ export default function NewCheckView({
               </option>
             ))}
           </select>
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
         </div>
 
         {/* Row 3: Draft Text Area */}
@@ -382,15 +314,9 @@ export default function NewCheckView({
         {/* Audit Engine Notice */}
         <div className="bg-[#F5F7FA] rounded-lg p-3 sm:p-4 border border-gray-200 text-xs text-gray-600 flex items-start gap-2.5 sm:gap-3">
           <AlertCircle className="w-4 h-4 text-[#176B59] shrink-0 mt-0.5" />
-<<<<<<< HEAD
           <div className="text-[11px] sm:text-xs">
-            <span className="font-semibold text-[#142B4A] block">Deterministic Rule Engine + Scikit-Learn Model</span>
-            Scans draft against restricted terminology, mandatory claims, and approved phrasing. Results require human review before publishing.
-=======
-          <div>
             <span className="font-semibold text-[#142B4A] block">Multi-Modal Brand Governance Engine</span>
             Scans text copy against restricted phrases and terminology, extracts dominant image HEX swatches, calculates WCAG contrast ratios, and evaluates clear-space padding before publication.
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </div>
         </div>
 
@@ -415,13 +341,8 @@ export default function NewCheckView({
               </>
             ) : (
               <>
-<<<<<<< HEAD
-                <span>Run Brand Check</span>
-                <Send className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
-=======
                 <span>Run Brand Governance Check</span>
-                <Send className="w-4 h-4" />
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+                <Send className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               </>
             )}
           </button>

@@ -102,11 +102,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
-<<<<<<< HEAD
-      return res.status(400).json({ success: false, error: 'Profile ID is invalid' })
-=======
       return res.status(400).json({ success: false, error: 'Invalid profile ID format' })
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     }
     const updated = await BrandProfile.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

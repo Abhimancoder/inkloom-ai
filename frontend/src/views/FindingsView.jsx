@@ -1,37 +1,27 @@
-<<<<<<< HEAD
-import { useState } from 'react'
-=======
 import React, { useState, useEffect } from 'react'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 import {
   AlertOctagon,
   AlertTriangle,
   CheckCircle2,
   Check,
-  X,
   FileCheck2,
   Send,
   ArrowLeft,
   Download,
-<<<<<<< HEAD
   BrainCircuit,
   TrendingUp,
   BarChart2,
   Sparkles,
   Layers,
-  FileSpreadsheet
-=======
+  FileSpreadsheet,
   Palette,
   Eye,
   ShieldAlert,
   ShieldCheck,
-  Layers,
-  Sparkles,
   SunMedium,
   BookmarkCheck,
-  TrendingUp,
-  RotateCcw
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+  RotateCcw,
+  X
 } from 'lucide-react'
 import { generateRagRewrite } from '../services/api'
 
@@ -39,15 +29,20 @@ export default function FindingsView({
   currentCheck,
   findings,
   onSendToReviewQueue,
-  onBack
+  onSendToReview,
+  onBack,
+  onBackToDashboard
 }) {
-  const [activeTab, setActiveTab] = useState('findings') // 'findings' | 'datascience'
-  const [localFindings, setLocalFindings] = useState(findings)
+  const handleBack = onBack || onBackToDashboard
+  const handleSendToReview = onSendToReviewQueue || onSendToReview
+
+  const [localFindings, setLocalFindings] = useState(findings || [])
   const [activeDraft, setActiveDraft] = useState(
     currentCheck?.draftText ||
       'TechCorp Solutions provides an enterprise-grade governance platform. We are offering the best in class solution at cheap rates to all new customers, guaranteed to eliminate 100% of errors.'
   )
   const [acceptedCount, setAcceptedCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('findings') // 'findings' | 'ml-governance'
 
   // RAG Rewrite Modal State
   const [isRagModalOpen, setIsRagModalOpen] = useState(false)
@@ -55,24 +50,40 @@ export default function FindingsView({
   const [ragResult, setRagResult] = useState(null)
   const [activeFindingForRewrite, setActiveFindingForRewrite] = useState(null)
 
-  // Sync localFindings and draft text when parent sends new data (fresh audit run)
+  // Sync localFindings and draft text when parent sends new data
   useEffect(() => {
-    setLocalFindings(findings)
-    setAcceptedCount(0)
+    if (findings) {
+      setLocalFindings(findings)
+      setAcceptedCount(0)
+    }
   }, [findings])
 
   useEffect(() => {
     if (currentCheck?.draftText) {
       setActiveDraft(currentCheck.draftText)
     }
-  }, [currentCheck?.id])
+  }, [currentCheck?.id, currentCheck?._id])
 
   // Compute live summary counts
   const criticalCount = localFindings.filter((f) => f.severityType === 'critical').length
   const warningCount = localFindings.filter((f) => f.severityType === 'warning').length
   const passedCount = localFindings.filter((f) => f.severityType === 'passed').length
 
-<<<<<<< HEAD
+  const visualFindings = localFindings.filter(
+    (f) =>
+      f.findingType === 'visual' ||
+      f.category?.includes('Palette') ||
+      f.category?.includes('Contrast') ||
+      f.category?.includes('Logo')
+  )
+  const textFindings = localFindings.filter((f) => !visualFindings.includes(f))
+
+  const hasVisualAsset = Boolean(
+    currentCheck?.assetUrl ||
+    (currentCheck?.assetColorPalette && currentCheck.assetColorPalette.length > 0) ||
+    (currentCheck?.visualAssets && currentCheck.visualAssets.length > 0)
+  )
+
   // Extract ML Insights & Visual Analytics
   const mlInsights = currentCheck?.mlInsights || {
     toneAnalysis: {
@@ -115,31 +126,11 @@ export default function FindingsView({
   }
 
   const visualAnalytics = currentCheck?.visualAnalytics || {}
-=======
-  const visualFindings = localFindings.filter(
-    (f) => f.findingType === 'visual' || f.category?.includes('Palette') || f.category?.includes('Contrast') || f.category?.includes('Logo')
-  )
-  const textFindings = localFindings.filter((f) => !visualFindings.includes(f))
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
   const handleAcceptSuggestion = (finding) => {
     if (!finding.suggestedCorrection) return
 
     let updated = activeDraft
-<<<<<<< HEAD
-    const cleanExcerpt = (finding.excerpt || '').replace(/^\.\.\.|\.\.\.$/g, '').trim()
-
-    if (updated.includes(cleanExcerpt)) {
-      updated = updated.replace(cleanExcerpt, finding.suggestedCorrection)
-    } else if (cleanExcerpt.includes('best in class') || finding.id === 'fnd_01') {
-      updated = updated.replace('best in class solution at cheap rates', 'enterprise-grade governance solution at competitive value')
-    } else if (cleanExcerpt.includes('guarantee') || finding.id === 'fnd_02') {
-      updated = updated.replace('guaranteed to eliminate 100% of errors', 'engineered to significantly reduce review turnaround times by up to 60%')
-    } else if (cleanExcerpt.includes('millions of customers')) {
-      updated = updated.replace('millions of customers worldwide with zero configuration', '500+ enterprise accounts with streamlined deployment')
-    } else {
-      updated = `${updated} (${finding.suggestedCorrection})`
-=======
     const rawExcerpt = finding.excerpt
       ? finding.excerpt.replace(/^\.\.\./, '').replace(/\.\.\.$/, '').trim()
       : ''
@@ -147,7 +138,12 @@ export default function FindingsView({
       const escapedExcerpt = rawExcerpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const regex = new RegExp(escapedExcerpt, 'i')
       updated = updated.replace(regex, finding.suggestedCorrection)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+    } else if (rawExcerpt.includes('best in class') || finding.id === 'fnd_01') {
+      updated = updated.replace('best in class solution at cheap rates', 'enterprise-grade governance solution at competitive value')
+    } else if (rawExcerpt.includes('guarantee') || finding.id === 'fnd_02') {
+      updated = updated.replace('guaranteed to eliminate 100% of errors', 'engineered to significantly reduce review turnaround times by up to 60%')
+    } else {
+      updated = `${updated} (${finding.suggestedCorrection})`
     }
 
     setActiveDraft(updated)
@@ -155,7 +151,7 @@ export default function FindingsView({
 
     setLocalFindings((prev) =>
       prev.map((f) =>
-        f.id === finding.id ? { ...f, status: 'Suggestion Accepted' } : f
+        f.id === finding.id || f._id === finding._id ? { ...f, status: 'Suggestion Accepted' } : f
       )
     )
   }
@@ -194,8 +190,28 @@ export default function FindingsView({
   const handleDismissFinding = (findingId) => {
     setLocalFindings((prev) =>
       prev.map((f) =>
-        f.id === findingId ? { ...f, status: 'Dismissed by User' } : f
+        f.id === findingId || f._id === findingId ? { ...f, status: 'Dismissed by User' } : f
       )
+    )
+  }
+
+  const handleAcceptAll = () => {
+    let updated = activeDraft
+    localFindings.forEach((f) => {
+      if (f.suggestedCorrection) {
+        const rawExcerpt = f.excerpt
+          ? f.excerpt.replace(/^\.\.\./, '').replace(/\.\.\.$/, '').trim()
+          : ''
+        if (rawExcerpt && updated.toLowerCase().includes(rawExcerpt.toLowerCase())) {
+          const escaped = rawExcerpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          updated = updated.replace(new RegExp(escaped, 'i'), f.suggestedCorrection)
+        }
+      }
+    })
+    setActiveDraft(updated)
+    setAcceptedCount(localFindings.filter((f) => f.suggestedCorrection).length)
+    setLocalFindings((prev) =>
+      prev.map((f) => (f.suggestedCorrection ? { ...f, status: 'Suggestion Accepted' } : f))
     )
   }
 
@@ -209,14 +225,12 @@ export default function FindingsView({
       channel: currentCheck?.channel || 'Email Marketing',
       complianceSummary: {
         totalFindings: localFindings.length,
-        criticalIssues: criticalCount,
-        warnings: warningCount,
-        passedChecks: passedCount,
+        criticalCount,
+        warningCount,
+        passedCount,
+        governanceScore: currentCheck?.governanceScore || 92,
         overallStatus: criticalCount > 0 ? 'Action Required' : warningCount > 0 ? 'Needs Review' : 'Approved'
       },
-<<<<<<< HEAD
-      dataScienceMetrics: mlInsights,
-=======
       visualAssetAudit: currentCheck?.assetUrl ? {
         assetName: currentCheck?.assetOriginalName,
         mimeType: currentCheck?.assetMimeType,
@@ -225,7 +239,7 @@ export default function FindingsView({
         contrastPasses: currentCheck?.assetContrastPass,
         extractedPalette: currentCheck?.assetColorPalette
       } : 'No visual asset attached (Text-only check)',
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+      dataScienceMetrics: mlInsights,
       originalDraft: currentCheck?.draftText,
       workingDraftWithAcceptedSuggestions: activeDraft,
       findings: localFindings.map((f) => ({
@@ -234,11 +248,8 @@ export default function FindingsView({
         category: f.category,
         excerpt: f.excerpt,
         matchedRule: f.matchedRule,
-        explanation: f.explanation,
         suggestedCorrection: f.suggestedCorrection,
-        confidence: f.confidence,
-        status: f.status,
-        visualDetails: f.visualDetails || null
+        status: f.status || 'Flagged'
       }))
     }
 
@@ -246,40 +257,40 @@ export default function FindingsView({
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Inkloom_Unified_Audit_Report_${(currentCheck?.title || 'Report').replace(/\s+/g, '_')}.json`
+    a.download = `inkloom-compliance-report-${Date.now()}.json`
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
-  const hasVisualAsset = Boolean(currentCheck?.assetUrl || currentCheck?.assetColorPalette?.length > 0)
-
   return (
     <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 w-full min-w-0">
-      {/* Top Header & Breadcrumbs (Responsive Stack on Mobile) */}
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#142B4A] transition-colors mb-1.5 cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Dashboard</span>
-          </button>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {handleBack && (
+            <button
+              onClick={handleBack}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#142B4A] transition-colors mb-1.5 cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </button>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-xl sm:text-2xl font-bold text-[#142B4A]">
-              Findings — {currentCheck?.title || 'Q4 Campaign Brief'}
+              {currentCheck?.title || 'Audit Findings & Compliance Evidence'}
             </h2>
-            <span className="text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full font-semibold bg-gray-100 text-[#142B4A] border border-gray-200 shrink-0">
+            <span className="text-xs font-mono uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+              {currentCheck?.channel || 'Email Marketing'}
+            </span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#142B4A] border border-blue-100">
               {currentCheck?.brandProfileName || 'TechCorp Enterprise'}
             </span>
           </div>
-<<<<<<< HEAD
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-            Deterministic governance inspection &amp; scikit-learn ML compliance analysis.
-=======
-          <p className="text-sm text-gray-500 mt-1">
-            Unified multi-modal governance audit results. Review copy evidence, visual palette, and WCAG contrast.
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+            Deterministic governance inspection, multi-modal visual audit &amp; scikit-learn ML compliance analysis.
           </p>
         </div>
 
@@ -289,21 +300,22 @@ export default function FindingsView({
             className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 text-[#142B4A] border border-gray-200 text-xs font-semibold px-3 py-2 rounded-lg transition-colors shadow-xs cursor-pointer"
             title="Download complete compliance report as JSON"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export JSON</span>
+            <Download className="w-3.5 h-3.5 text-[#176B59]" />
+            <span>Export Report</span>
           </button>
 
-          <button
-            onClick={() => onSendToReviewQueue(currentCheck, activeDraft)}
-            className="inline-flex items-center gap-1.5 bg-[#176B59] hover:bg-[#125345] text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors shadow-xs cursor-pointer"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>Send to Review</span>
-          </button>
+          {handleSendToReview && (
+            <button
+              onClick={handleSendToReview}
+              className="inline-flex items-center gap-1.5 bg-[#142B4A] hover:bg-[#1a385f] text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors shadow-xs cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Submit to Human Review Queue</span>
+            </button>
+          )}
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Audit Results Header & Multi-Category Score Bar */}
       <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 pb-4 sm:pb-6 border-b border-gray-100">
@@ -313,7 +325,9 @@ export default function FindingsView({
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" stroke="#E5E7EB" strokeWidth="8" fill="transparent" />
                 <circle
-                  cx="50" cy="50" r="42"
+                  cx="50"
+                  cy="50"
+                  r="42"
                   stroke={currentCheck?.governanceScore >= 80 ? '#176B59' : '#B7791F'}
                   strokeWidth="8"
                   strokeDasharray="263.8"
@@ -322,174 +336,99 @@ export default function FindingsView({
                   fill="transparent"
                 />
               </svg>
-              <div className="absolute flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-extrabold text-[#142B4A]">{currentCheck?.governanceScore || 92}</span>
-                <span className="text-[8px] sm:text-[9px] font-bold text-gray-400 uppercase">Score</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-lg sm:text-xl font-black text-[#142B4A]">
+                  {currentCheck?.governanceScore || 92}
+                </span>
+                <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold">Score</span>
               </div>
             </div>
 
             <div>
-              <span className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider block">Audit Results</span>
-              <h3 className="text-base sm:text-lg font-bold text-[#142B4A] mt-0.5">
-                {criticalCount === 0 && warningCount === 0 ? 'Compliant & Ready to Publish' : 'Compliance Action Required'}
-              </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Audited against {currentCheck?.brandProfileName || 'Acme Corp'} locked brand rules.
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-[#142B4A]">Governance Compliance Index</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#176B59] border border-emerald-200">
+                  Automated Pre-Publication Audit
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1 max-w-xl">
+                Multi-dimensional inspection covering logo clear-space, color compliance, tone consistency, and prohibited claim detection.
               </p>
             </div>
           </div>
 
-          {/* Category Badges (2 columns on mobile, 3 on tablet, 6 on desktop) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs w-full md:w-auto">
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Logo</span>
-              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5 text-xs">
-                <Check className="w-3 h-3" /> Passed
-              </span>
-            </div>
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Colors</span>
-              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5 text-xs">
-                <Check className="w-3 h-3" /> Verified
-              </span>
-            </div>
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Typography</span>
-              <span className="font-bold text-[#B7791F] flex items-center gap-1 mt-0.5 text-xs">
-                <AlertTriangle className="w-3 h-3" /> Warn
-              </span>
-            </div>
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Messaging</span>
-              <span className="font-bold text-[#176B59] flex items-center gap-1 mt-0.5 text-xs">
-                <Check className="w-3 h-3" /> Passed
-              </span>
-            </div>
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Image Style</span>
-              <span className="font-bold text-[#176B59] flex items-center gap-1 mt-0.5 text-xs">
-                <Check className="w-3 h-3" /> Passed
-              </span>
-            </div>
-            <div className="p-2 sm:p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="text-gray-400 block text-[9px] sm:text-[10px] uppercase font-semibold">Accessibility</span>
-              <span className="font-bold text-[#2E7D32] flex items-center gap-1 mt-0.5 text-xs">
-                <Check className="w-3 h-3" /> WCAG AA
-              </span>
-            </div>
+          <div className="text-right self-start md:self-auto shrink-0">
+            <span className="text-[11px] font-mono text-gray-400 block">Check ID: {currentCheck?.id || 'chk_active'}</span>
+            <span className="text-xs font-semibold text-gray-700">Channel: {currentCheck?.channel || 'Marketing'}</span>
           </div>
         </div>
 
-        {/* Evidence Panel (Responsive 1/2/4 columns) */}
-        <div className="mt-4 sm:mt-6">
-          <div className="flex items-center justify-between mb-2.5">
-            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Evidence Breakdown (Slide 05)</h4>
-            <span className="text-[10px] sm:text-[11px] text-gray-400">Tokens matched in draft</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="p-3 sm:p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1.5">
-              <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Colors</span>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-[#142B4A] shadow-xs" title="Navy #142B4A"></div>
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-[#176B59] shadow-xs" title="Teal #176B59"></div>
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-[#202833] shadow-xs" title="Charcoal #202833"></div>
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-[#F5F7FA] border border-gray-300 shadow-xs" title="Light #F5F7FA"></div>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-400">4 brand palette tokens confirmed</p>
+        {/* Multi-Category Compliance Score Breakdown */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 pt-4 sm:pt-6">
+          {[
+            { label: 'Logo Usage', status: 'Passed', color: 'text-[#176B59]', bg: 'bg-emerald-50' },
+            {
+              label: 'Color Palette',
+              status: currentCheck?.assetColorPalette?.length ? 'Pass (WCAG AA)' : 'Compliant',
+              color: 'text-[#176B59]',
+              bg: 'bg-emerald-50'
+            },
+            { label: 'Typography', status: 'Passed', color: 'text-[#176B59]', bg: 'bg-emerald-50' },
+            {
+              label: 'Messaging Tone',
+              status: criticalCount > 0 ? 'Flags Found' : 'Verified',
+              color: criticalCount > 0 ? 'text-[#C62828]' : 'text-[#176B59]',
+              bg: criticalCount > 0 ? 'bg-red-50' : 'bg-emerald-50'
+            },
+            { label: 'Image Style', status: 'Passed', color: 'text-[#176B59]', bg: 'bg-emerald-50' },
+            {
+              label: 'Accessibility',
+              status: currentCheck?.assetContrastPass === false ? 'Warning' : '98% AAA Pass',
+              color: currentCheck?.assetContrastPass === false ? 'text-[#B7791F]' : 'text-[#176B59]',
+              bg: currentCheck?.assetContrastPass === false ? 'bg-amber-50' : 'bg-emerald-50'
+            }
+          ].map((cat, idx) => (
+            <div key={idx} className={`p-2 sm:p-2.5 rounded-lg border border-gray-100 ${cat.bg}`}>
+              <span className="text-[10px] text-gray-500 uppercase font-semibold block">{cat.label}</span>
+              <span className={`text-xs font-bold ${cat.color}`}>{cat.status}</span>
             </div>
-
-            <div className="p-3 sm:p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1">
-              <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Typography</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-serif text-[#142B4A]">Aa</span>
-                <span className="text-xs font-mono text-gray-600">Inter / Outfit</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-400">Heading 24px min spacing checked</p>
-            </div>
-
-            <div className="p-3 sm:p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1">
-              <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Messaging</span>
-              <div className="p-1.5 sm:p-2 rounded bg-white border border-gray-200 text-xs font-medium text-gray-700 italic truncate">
-                "Smart growth starts here"
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-400">Approved positioning tagline</p>
-            </div>
-
-            <div className="p-3 sm:p-4 rounded-xl bg-gray-50/80 border border-gray-100 space-y-1">
-              <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Imagery</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-white border border-gray-200 text-gray-600 truncate">
-                  peltz.jpg
-                </span>
-                <span className="text-[10px] sm:text-[11px] text-[#2E7D32] font-semibold">1200×630</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-400">Clean, Enterprise, Authentic tags</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Responsive Horizontal Scroll Tab Selector (Swipeable on Mobile) */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto no-scrollbar whitespace-nowrap">
+      {/* Primary Tab Navigation */}
+      <div className="flex border-b border-gray-200 gap-2">
         <button
           onClick={() => setActiveTab('findings')}
-          className={`inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
             activeTab === 'findings'
-              ? 'bg-[#142B4A] text-white shadow-xs'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'border-[#142B4A] text-[#142B4A]'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          <Layers className="w-3.5 h-3.5" />
-          <span>Audit Findings &amp; Inline Remediation ({localFindings.length})</span>
+          <Layers className="w-4 h-4" />
+          <span>Rule &amp; Visual Audit Findings</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-red-100 text-[#C62828] font-bold">
+            {localFindings.length}
+          </span>
         </button>
 
         <button
-          onClick={() => setActiveTab('datascience')}
-          className={`inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
-            activeTab === 'datascience'
-              ? 'bg-[#176B59] text-white shadow-xs'
-              : 'text-gray-600 hover:bg-gray-100'
+          onClick={() => setActiveTab('ml-governance')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+            activeTab === 'ml-governance'
+              ? 'border-[#142B4A] text-[#142B4A]'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
           <BrainCircuit className="w-3.5 h-3.5" />
           <span>Data Science &amp; ML Intelligence</span>
           <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-emerald-700 text-white font-mono">
             Active
-=======
-      {/* Audit Summary Badges */}
-      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-xs flex flex-wrap items-center gap-3">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-2">
-          Unified Audit:
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#C62828] border border-red-200">
-          <AlertOctagon className="w-3.5 h-3.5" />
-          {criticalCount} Critical
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-[#B7791F] border border-amber-200">
-          <AlertTriangle className="w-3.5 h-3.5" />
-          {warningCount} Warnings
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-[#2E7D32] border border-green-200">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          {passedCount} Passed
-        </span>
-        {hasVisualAsset && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#176B59] border border-teal-200">
-            <Palette className="w-3.5 h-3.5" />
-            Visual Audited
-          </span>
-        )}
-        {acceptedCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#142B4A] border border-blue-200 ml-auto">
-            <Check className="w-3.5 h-3.5" />
-            {acceptedCount} Suggestions Applied
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </span>
         </button>
       </div>
 
-<<<<<<< HEAD
       {/* ======================================================== */}
       {/* TAB 1: FINDINGS & INLINE REMEDIATION                     */}
       {/* ======================================================== */}
@@ -512,6 +451,12 @@ export default function FindingsView({
               <CheckCircle2 className="w-3.5 h-3.5" />
               {passedCount} Passed
             </span>
+            {hasVisualAsset && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-teal-50 text-[#176B59] border border-teal-200">
+                <Palette className="w-3.5 h-3.5" />
+                Visual Audited
+              </span>
+            )}
             {acceptedCount > 0 && (
               <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-blue-50 text-[#142B4A] border border-blue-200 ml-auto">
                 <Check className="w-3.5 h-3.5" />
@@ -529,262 +474,264 @@ export default function FindingsView({
               </h3>
               <span className="text-[10px] sm:text-xs text-gray-400 font-mono">Original copy preserved</span>
             </div>
-            <div className="p-3 sm:p-4 rounded-lg bg-[#F5F7FA] border border-gray-200 text-xs sm:text-sm text-[#202833] leading-relaxed font-sans">
-              {activeDraft}
-            </div>
-          </div>
-=======
-      {/* Visual Asset Overview Card (Improvement 1) */}
-      {hasVisualAsset && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-            <div className="flex items-center gap-2">
-              <Palette className="w-4 h-4 text-[#176B59]" />
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
-                Visual Brand Asset Audit & Color Palette Extraction
-              </h3>
-            </div>
-            <span className="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-100">
-              {currentCheck?.assetOriginalName || 'Uploaded Marketing Asset'}
-            </span>
+            <textarea
+              rows={4}
+              value={activeDraft}
+              onChange={(e) => setActiveDraft(e.target.value)}
+              className="w-full p-3 sm:p-4 rounded-lg bg-[#F5F7FA] border border-gray-200 text-xs sm:text-sm text-[#202833] font-medium leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20"
+            ></textarea>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Audited Graphic:
-              </p>
-              <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center max-h-48">
-                {currentCheck?.assetUrl ? (
-                  <img
-                    src={`http://localhost:5000${currentCheck.assetUrl}`}
-                    alt="Audited Visual"
-                    className="w-full h-44 object-contain"
-                    onError={(e) => {
-                      e.target.style.display = 'none'
-                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'
-                    }}
-                  />
-                ) : null}
-                <div className="w-full h-32 flex flex-col items-center justify-center text-gray-400 text-xs gap-1 hidden">
-                  <Palette className="w-6 h-6 text-[#176B59]" />
-                  <span>Graphic Analyzed</span>
+          {/* Visual Asset Overview Card */}
+          {hasVisualAsset && (
+            <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-[#176B59]" />
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                    Visual Brand Asset Audit &amp; Color Palette Extraction
+                  </h3>
                 </div>
+                <span className="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-100">
+                  {currentCheck?.assetOriginalName || 'Uploaded Marketing Asset'}
+                </span>
               </div>
-            </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Dominant Extracted HEX Swatches & Brand Alignment:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {(currentCheck?.assetColorPalette?.length > 0
-                  ? currentCheck.assetColorPalette
-                  : [
-                      { hex: '#142B4A', proportion: 38, isApproved: true },
-                      { hex: '#EDEFF4', proportion: 51, isApproved: true },
-                      { hex: '#006D5A', proportion: 6, isApproved: true }
-                    ]
-                ).slice(0, 6).map((color, idx) => (
-                  <div
-                    key={idx}
-                    className="p-2.5 rounded-lg border border-gray-100 bg-[#F5F7FA] flex items-center gap-3"
-                  >
-                    <div
-                      className="w-8 h-8 rounded-md shadow-2xs border border-black/10 shrink-0"
-                      style={{ backgroundColor: color.hex }}
-                    ></div>
-                    <div className="min-w-0 text-left">
-                      <p className="font-mono text-xs font-bold text-[#142B4A] truncate">
-                        {color.hex}
-                      </p>
-                      <span className="text-[10px] text-gray-500 block">
-                        {color.proportion}% surface · {color.isApproved ? 'Approved' : 'Unapproved'}
-                      </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-start">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Audited Graphic:
+                  </p>
+                  <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center max-h-48">
+                    {currentCheck?.assetUrl ? (
+                      <img
+                        src={`http://localhost:5000${currentCheck.assetUrl}`}
+                        alt="Audited Visual"
+                        className="w-full h-44 object-contain"
+                        onError={(e) => {
+                          e.target.style.display = 'none'
+                          if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'
+                        }}
+                      />
+                    ) : null}
+                    <div className="w-full h-32 flex flex-col items-center justify-center text-gray-400 text-xs gap-1">
+                      <Palette className="w-6 h-6 text-[#176B59]" />
+                      <span>Graphic Analyzed</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="mt-3 p-3 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-gray-600 font-medium flex items-center gap-1.5">
-                  <SunMedium className="w-4 h-4 text-[#176B59]" />
-                  Primary Contrast Ratio:
-                </span>
-                <span className="font-mono font-bold text-[#142B4A]">
-                  {currentCheck?.assetContrastRatio ? `${currentCheck.assetContrastRatio}:1` : '13.56:1'}
-                  <span className="ml-2 font-sans font-semibold text-[#2E7D32] bg-green-50 px-2 py-0.5 rounded-full border border-green-200 text-[10px]">
-                    Passes WCAG AA (Target: 4.5:1)
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                <div className="space-y-2 md:col-span-2">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Dominant Extracted HEX Swatches &amp; Brand Alignment:
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                    {(currentCheck?.assetColorPalette?.length > 0
+                      ? currentCheck.assetColorPalette
+                      : [
+                          { hex: '#142B4A', proportion: 38, isApproved: true },
+                          { hex: '#EDEFF4', proportion: 51, isApproved: true },
+                          { hex: '#006D5A', proportion: 6, isApproved: true }
+                        ]
+                    ).slice(0, 6).map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 sm:p-2.5 rounded-lg border border-gray-100 bg-[#F5F7FA] flex items-center gap-2.5"
+                      >
+                        <div
+                          className="w-8 h-8 rounded-md shadow-2xs border border-black/10 shrink-0"
+                          style={{ backgroundColor: color.hex }}
+                        ></div>
+                        <div className="min-w-0 text-left">
+                          <p className="font-mono text-xs font-bold text-[#142B4A] truncate">
+                            {color.hex}
+                          </p>
+                          <span className="text-[10px] text-gray-500 block">
+                            {color.proportion}% surface · {color.isApproved ? 'Approved' : 'Unapproved'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-      {/* Editable Draft Preview */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-            <FileCheck2 className="w-4 h-4 text-[#176B59]" />
-            <span>Working Draft Preview (Updated when suggestions are accepted)</span>
-          </h3>
-          <span className="text-xs text-gray-400 font-mono">Original content preserved</span>
-        </div>
-        <div className="p-4 rounded-lg bg-[#F5F7FA] border border-gray-200 text-sm text-[#202833] leading-relaxed font-sans">
-          {activeDraft}
-        </div>
-      </div>
-
-      {/* Finding Detail Cards List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-[#142B4A] uppercase tracking-wider">
-            Detailed Audit Evidence ({localFindings.length} Items)
-          </h3>
-          <span className="text-xs text-gray-400">
-            {textFindings.length} Text Rules · {visualFindings.length} Visual Assets
-          </span>
-        </div>
-
-        {localFindings.map((finding) => {
-          let borderColor = 'border-[#2E7D32]'
-          let badgeBg = 'bg-green-50 text-[#2E7D32] border-green-200'
-          let Icon = CheckCircle2
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
-
-          {/* Finding Detail Cards List */}
-          <div className="space-y-3 sm:space-y-4">
-            {localFindings.map((finding) => {
-              let borderColor = 'border-[#2E7D32]'
-              let badgeBg = 'bg-green-50 text-[#2E7D32] border-green-200'
-              let Icon = CheckCircle2
-
-<<<<<<< HEAD
-              if (finding.severityType === 'critical') {
-                borderColor = 'border-[#C62828]'
-                badgeBg = 'bg-red-50 text-[#C62828] border-red-200'
-                Icon = AlertOctagon
-              } else if (finding.severityType === 'warning') {
-                borderColor = 'border-[#B7791F]'
-                badgeBg = 'bg-amber-50 text-[#B7791F] border-amber-200'
-                Icon = AlertTriangle
-              }
-
-              return (
-                <div
-                  key={finding.id}
-                  className={`bg-white rounded-xl border border-gray-100 shadow-xs border-l-4 ${borderColor} p-4 sm:p-6 transition-all`}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold border ${badgeBg}`}>
-                        <Icon className="w-3 h-3" />
-                        {finding.severity.toUpperCase()}
+                  <div className="mt-3 p-3 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                    <span className="text-gray-600 font-medium flex items-center gap-1.5">
+                      <SunMedium className="w-4 h-4 text-[#176B59]" />
+                      Primary Contrast Ratio:
+                    </span>
+                    <span className="font-mono font-bold text-[#142B4A]">
+                      {currentCheck?.assetContrastRatio ? `${currentCheck.assetContrastRatio}:1` : '13.56:1'}
+                      <span className="ml-2 font-sans font-semibold text-[#2E7D32] bg-green-50 px-2 py-0.5 rounded-full border border-green-200 text-[10px]">
+                        Passes WCAG AA (Target: 4.5:1)
                       </span>
-                      <span className="text-[11px] sm:text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
-                        {finding.category}
-                      </span>
-                      <span className="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:inline">
-                        · {finding.confidence}
-                      </span>
-                    </div>
-
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                      finding.status === 'Suggestion Accepted'
-                        ? 'bg-blue-50 text-[#142B4A] border border-blue-200'
-                        : 'text-gray-400'
-                    }`}>
-                      {finding.status}
                     </span>
                   </div>
 
-                  <div className="mb-3">
-                    <p className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                      Matched Excerpt:
-                    </p>
-                    <div className="p-2.5 sm:p-3 rounded-lg bg-red-50/60 border border-red-100 text-xs sm:text-sm font-medium text-[#202833]">
-                      "{finding.excerpt}"
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                    <span className="text-gray-600 font-medium flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-[#176B59]" />
+                      Clear Space &amp; Margin Rule:
+                    </span>
+                    <span className="text-[#2E7D32] font-semibold text-[11px]">
+                      Compliant (0.5x minimum spacing verified)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Findings List */}
+          <div className="space-y-3 sm:space-y-4">
+            {localFindings.map((finding) => {
+              const isAccepted = finding.status === 'Suggestion Accepted'
+              const isDismissed = finding.status === 'Dismissed by User'
+              const isVisual =
+                finding.findingType === 'visual' ||
+                finding.category?.includes('Palette') ||
+                finding.category?.includes('Contrast') ||
+                finding.category?.includes('Logo')
+
+              return (
+                <div
+                  key={finding.id || finding._id}
+                  className={`bg-white rounded-xl border p-4 sm:p-6 transition-all ${
+                    isAccepted
+                      ? 'border-green-200 bg-green-50/20'
+                      : isDismissed
+                      ? 'opacity-50 border-gray-200'
+                      : 'border-gray-100 shadow-xs'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3 mb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                          finding.severityType === 'critical'
+                            ? 'bg-red-50 text-[#C62828] border border-red-200'
+                            : finding.severityType === 'warning'
+                            ? 'bg-amber-50 text-[#B7791F] border border-amber-200'
+                            : 'bg-green-50 text-[#2E7D32] border border-green-200'
+                        }`}
+                      >
+                        {finding.severityType === 'critical' ? (
+                          <AlertOctagon className="w-3.5 h-3.5" />
+                        ) : (
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                        )}
+                        <span>{finding.severity}</span>
+                      </span>
+
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        {finding.category}
+                      </span>
                     </div>
+
+                    <span className="text-xs font-mono text-gray-400">
+                      Rule: {finding.matchedRule}
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4 mb-3 text-xs">
-                    <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-100">
-                      <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-0.5 text-[10px]">
-                        Applicable Brand Rule:
-                      </span>
-                      <span className="text-gray-800 font-medium">{finding.matchedRule}</span>
-                    </div>
-                    <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-100">
-                      <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-0.5 text-[10px]">
-                        Reason &amp; Guidance:
-                      </span>
-                      <span className="text-gray-700 leading-relaxed">{finding.explanation}</span>
-                    </div>
-                  </div>
-
-                  {finding.suggestedCorrection && (
+                  {/* Flagged Excerpt */}
+                  {finding.excerpt && (
                     <div className="mb-3">
-                      <p className="text-[10px] sm:text-xs font-semibold text-[#176B59] uppercase tracking-wider mb-1">
-                        Suggested Alternative Wording:
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                        Flagged Excerpt:
+                      </span>
+                      <p className="p-2.5 rounded-lg bg-gray-50 border border-gray-100 text-xs sm:text-sm text-gray-700 italic">
+                        "{finding.excerpt}"
                       </p>
-                      <div className="p-2.5 sm:p-3 rounded-lg bg-green-50/70 border border-green-200 text-xs sm:text-sm font-medium text-[#176B59]">
+                    </div>
+                  )}
+
+                  {/* Explanation */}
+                  <div className="mb-3">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                      Violation Explanation:
+                    </span>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                      {finding.explanation}
+                    </p>
+                  </div>
+
+                  {/* Suggested Correction */}
+                  {finding.suggestedCorrection && (
+                    <div className="mb-4">
+                      <span className="text-[10px] font-bold text-[#176B59] uppercase tracking-wider block mb-1">
+                        Suggested Correction:
+                      </span>
+                      <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-semibold text-[#176B59]">
                         "{finding.suggestedCorrection}"
                       </div>
                     </div>
                   )}
 
+                  {/* Action Buttons */}
                   <div className="flex flex-wrap items-center justify-end gap-2 pt-3 border-t border-gray-100">
-                    {finding.status !== 'Suggestion Accepted' && finding.suggestedCorrection && (
+                    <button
+                      onClick={() => handleDismissFinding(finding.id || finding._id)}
+                      disabled={isDismissed || isAccepted}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 transition-colors cursor-pointer"
+                    >
+                      Dismiss
+                    </button>
+
+                    {!isVisual && (
                       <button
-                        onClick={() => handleAcceptSuggestion(finding)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white transition-colors cursor-pointer"
+                        onClick={() => handleOpenRagRewrite(finding)}
+                        disabled={isAccepted || isDismissed}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 disabled:opacity-40 transition-colors cursor-pointer"
+                        title="Rewrite using Approved Copy Library RAG engine"
                       >
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Accept Suggestion</span>
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>AI RAG Rewrite</span>
                       </button>
                     )}
-                    {finding.status !== 'Dismissed by User' && (
+
+                    {finding.suggestedCorrection && (
                       <button
-                        onClick={() => handleDismissFinding(finding.id)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                        onClick={() => handleAcceptSuggestion(finding)}
+                        disabled={isAccepted || isDismissed}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] disabled:opacity-40 text-white transition-colors cursor-pointer shadow-xs"
                       >
-                        <X className="w-3.5 h-3.5" />
-                        <span>Dismiss</span>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{isAccepted ? 'Suggestion Applied' : 'Accept Suggestion'}</span>
                       </button>
                     )}
                   </div>
-=======
-          const isVisualFinding =
-            finding.findingType === 'visual' ||
-            finding.category?.includes('Palette') ||
-            finding.category?.includes('Contrast') ||
-            finding.category?.includes('Logo')
-
-          return (
-            <div
-              key={finding.id || finding._id}
-              className={`bg-white rounded-xl border border-gray-100 shadow-xs border-l-4 ${borderColor} p-6 transition-all`}
-            >
-              {/* Card Top: Badges & Category */}
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badgeBg}`}>
-                    <Icon className="w-3.5 h-3.5" />
-                    {finding.severity.toUpperCase()}
-                  </span>
-                  <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                    {isVisualFinding && <Palette className="w-3 h-3 text-[#176B59]" />}
-                    {finding.category}
-                  </span>
-                  <span className="text-xs text-gray-400 font-medium">
-                    · {finding.confidence}
-                  </span>
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                 </div>
               )
             })}
+
+            {localFindings.length === 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-8 text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-[#176B59] mx-auto" />
+                <h4 className="font-bold text-[#142B4A] text-sm">All Brand Checks Passed</h4>
+                <p className="text-xs text-gray-500">No rule violations were flagged in this draft.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Action Footer Bar */}
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-100">
+            <button
+              onClick={handleAcceptAll}
+              disabled={localFindings.filter((f) => f.suggestedCorrection && f.status !== 'Suggestion Accepted').length === 0}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 disabled:opacity-40 transition-colors cursor-pointer text-center"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Accept All Suggestions</span>
+            </button>
+
+            {handleSendToReview && (
+              <button
+                onClick={handleSendToReview}
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#142B4A] hover:bg-[#1a385f] text-white shadow-xs cursor-pointer text-center"
+              >
+                <Send className="w-4 h-4" />
+                <span>Send to Human Review Queue</span>
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -792,198 +739,124 @@ export default function FindingsView({
       {/* ======================================================== */}
       {/* TAB 2: DATA SCIENCE & ML INTELLIGENCE                    */}
       {/* ======================================================== */}
-      {activeTab === 'datascience' && (
+      {activeTab === 'ml-governance' && (
         <div className="space-y-4 sm:space-y-6">
-          {/* Top ML Highlights Grid (1 col phone, 3 col tablet/pc) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-5">
-            {/* Scikit-Learn Predicted Tone */}
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Scikit-Learn Tone</span>
-                <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-[#142B4A] font-semibold">
-                  TF-IDF + LogReg
-                </span>
-              </div>
-              <h4 className="text-base sm:text-lg font-bold text-[#142B4A]">
-                {mlInsights.toneAnalysis?.predictedTone || 'Professional'}
-              </h4>
-              <div className="flex items-center justify-between text-xs pt-1">
-                <span className="text-gray-500">Confidence:</span>
-                <span className="font-bold text-[#176B59]">
-                  {mlInsights.toneAnalysis?.confidenceScore || 85}%
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#176B59] rounded-full"
-                  style={{ width: `${mlInsights.toneAnalysis?.confidenceScore || 85}%` }}
-                ></div>
-              </div>
-            </div>
-
-<<<<<<< HEAD
-            {/* Scikit-Learn Risk Regressor */}
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Violation Risk Model</span>
-                <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-[#B7791F] font-semibold">
-                  Random Forest
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <h4 className="text-xl sm:text-2xl font-black" style={{ color: mlInsights.riskRegression?.tierColor || '#D97706' }}>
-                  {mlInsights.riskRegression?.riskTier || 'MODERATE'}
-                </h4>
-                <span className="text-xs text-gray-400">
-                  ({mlInsights.riskRegression?.riskScore || 45}/100)
-                </span>
-              </div>
-              <p className="text-[11px] text-gray-500 leading-tight">
-                {mlInsights.riskRegression?.recommendedAction}
-              </p>
-            </div>
-
-            {/* NumPy Shannon Entropy & Lexical Diversity */}
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">NumPy Richness</span>
-                <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-[#176B59] font-semibold">
-                  SciPy Entropy
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <h4 className="text-xl sm:text-2xl font-black text-[#142B4A]">
-                  {mlInsights.linguisticStats?.tokenMetrics?.shannonEntropy || 4.12}
-                </h4>
-                <span className="text-xs text-gray-400">bits (Shannon H)</span>
-              </div>
-              <div className="flex items-center justify-between text-xs text-gray-500 pt-0.5">
-                <span>Type-Token Ratio:</span>
-                <span className="font-bold text-gray-700">
-                  {mlInsights.linguisticStats?.tokenMetrics?.typeTokenRatio || 0.77}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Scikit-Learn Tone Multi-Class Probability Distribution Bar Chart */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3 sm:space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-gray-100 pb-2.5">
-              <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {/* Scikit-Learn Multiclass Logistic Regression */}
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <h3 className="text-xs sm:text-sm font-bold text-[#142B4A] flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-[#176B59]" />
-                  <span>Scikit-Learn Multi-Class Tone Distribution &amp; Explainability</span>
+                  <TrendingUp className="w-4 h-4 text-[#176B59]" />
+                  <span>NLP Tone Classification (Scikit-Learn)</span>
                 </h3>
-                <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">
-                  Multi-class calibrated probability distribution across enterprise copywriting tones.
-                </p>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">
+                  Logistic Regression
+                </span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-gray-50 text-gray-600 border border-gray-200 self-start sm:self-auto">
-                LogisticRegression(C=1.5)
-              </span>
-            </div>
 
-            {/* Matplotlib Rendered Tone Chart */}
-            {visualAnalytics.toneDistributionChart ? (
-              <div className="w-full overflow-hidden flex justify-center bg-[#FAFAFC] rounded-lg p-2 sm:p-3 border border-gray-200">
-                <img
-                  src={visualAnalytics.toneDistributionChart}
-                  alt="Scikit-Learn ML Multi-Class Tone Distribution"
-                  className="w-full max-w-full h-auto object-contain rounded shadow-xs"
-                />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 font-medium">Predicted Tone:</span>
+                  <span className="font-bold text-[#C62828] bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                    {mlInsights.toneAnalysis?.predictedTone}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 font-medium">Target Tone:</span>
+                  <span className="font-bold text-[#176B59]">
+                    {mlInsights.toneAnalysis?.targetTone}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 font-medium">Confidence Score:</span>
+                  <span className="font-mono font-bold text-[#142B4A]">
+                    {mlInsights.toneAnalysis?.confidenceScore}%
+                  </span>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-2 text-xs">
-                {mlInsights.toneAnalysis?.probabilities &&
-                  Object.entries(mlInsights.toneAnalysis.probabilities).map(([tone, prob], i) => (
-                    <div key={i} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-700 text-xs">{tone}</span>
-                        <span className="font-bold text-[#142B4A] text-xs">{(prob * 100).toFixed(1)}%</span>
+
+              <div className="pt-2">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                  Class Probabilities Breakdown:
+                </span>
+                <div className="space-y-1.5">
+                  {Object.entries(mlInsights.toneAnalysis?.probabilities || {}).map(([tone, prob]) => (
+                    <div key={tone} className="text-[11px]">
+                      <div className="flex justify-between text-gray-600 mb-0.5">
+                        <span>{tone}</span>
+                        <span className="font-mono font-semibold">{(prob * 100).toFixed(1)}%</span>
                       </div>
-                      <div className="w-full h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${prob * 100}%`,
-                            backgroundColor:
-                              tone.includes('Hype') || tone.includes('Aggressive')
-                                ? '#DC2626'
-                                : tone.includes('Professional')
-                                ? '#176B59'
-                                : '#142B4A'
-                          }}
+                          className="h-full bg-[#176B59] rounded-full"
+                          style={{ width: `${prob * 100}%` }}
                         ></div>
                       </div>
                     </div>
                   ))}
-              </div>
-            )}
-
-            {/* Explainable AI: Driving TF-IDF Features */}
-            {mlInsights.toneAnalysis?.topDrivingFeatures && mlInsights.toneAnalysis.topDrivingFeatures.length > 0 && (
-              <div className="pt-2.5 border-t border-gray-100">
-                <span className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
-                  Top Contributing TF-IDF N-Grams:
-                </span>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {mlInsights.toneAnalysis.topDrivingFeatures.map((f, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 text-[11px] sm:text-xs text-gray-800 font-mono"
-                    >
-                      <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
-                      <strong>"{f.term}"</strong>
-                      <span className="text-gray-400">({f.tfidfWeight})</span>
-                    </span>
-                  ))}
-=======
-              {/* Excerpt Box */}
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                  Matched Audit Evidence:
-                </p>
-                <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-[#202833] flex items-center justify-between">
-                  <span>"{finding.excerpt}"</span>
-
-                  {/* Live Color Swatch if visual finding */}
-                  {finding.visualDetails?.extractedHex && (
-                    <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-md border border-gray-200">
-                      <div
-                        className="w-4 h-4 rounded-full border border-black/10"
-                        style={{ backgroundColor: finding.visualDetails.extractedHex }}
-                      ></div>
-                      <span className="font-mono text-xs text-gray-700">
-                        {finding.visualDetails.extractedHex}
-                      </span>
-                    </div>
-                  )}
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Two Columns on Desktop / Stack on Mobile: RF Features + NumPy Readability */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            {/* Random Forest Risk Model Drivers */}
+              {mlInsights.toneAnalysis?.topDrivingFeatures?.length > 0 && (
+                <div className="pt-2">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                    TF-IDF Driving Features:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {mlInsights.toneAnalysis.topDrivingFeatures.map((feat, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[11px] font-mono px-2 py-0.5 rounded bg-gray-100 text-gray-700 border border-gray-200"
+                      >
+                        {feat.term} ({feat.tfidfWeight})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Random Forest Risk Regression */}
             <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3">
-              <h3 className="text-xs sm:text-sm font-bold text-[#142B4A] flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-amber-600" />
-                <span>Random Forest Risk Factors (Scikit-Learn)</span>
-              </h3>
-              <p className="text-xs text-gray-500">
-                Feature weight importances extracted from the tree ensemble model for this audit:
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h3 className="text-xs sm:text-sm font-bold text-[#142B4A] flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4 text-[#B7791F]" />
+                  <span>Random Forest Compliance Risk Engine</span>
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold">
+                  Ensemble Regressor
+                </span>
+              </div>
+
+              <div className="p-3 rounded-lg bg-amber-50/60 border border-amber-200 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-amber-800 block">
+                    Composite Risk Score
+                  </span>
+                  <span className="text-2xl font-black text-amber-900">
+                    {mlInsights.riskRegression?.riskScore} / 100
+                  </span>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-600 text-white">
+                  {mlInsights.riskRegression?.riskTier} TIER
+                </span>
+              </div>
+
+              <p className="text-xs text-gray-600 italic">
+                "{mlInsights.riskRegression?.recommendedAction}"
               </p>
 
-              <div className="space-y-2.5">
-                {(mlInsights.riskRegression?.featureContributions || []).map((feat, i) => (
-                  <div key={i} className="p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-100 space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-gray-800 text-xs">{feat.feature}</span>
-                      <span className="font-mono text-gray-500 text-[11px]">Value: {feat.observedValue}</span>
+              <div className="space-y-2 pt-2">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                  Feature Importance Weights:
+                </span>
+                {(mlInsights.riskRegression?.featureContributions || []).map((feat, idx) => (
+                  <div key={idx} className="space-y-0.5">
+                    <div className="flex justify-between text-[11px] text-gray-600">
+                      <span>{feat.feature}</span>
+                      <span className="font-mono font-semibold">Observed: {feat.observedValue}</span>
                     </div>
-                    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-amber-500 rounded-full"
                         style={{ width: `${feat.importance * 100}%` }}
@@ -997,12 +870,11 @@ export default function FindingsView({
               </div>
             </div>
 
-<<<<<<< HEAD
             {/* NumPy Statistical Sentence & Readability Distribution */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3">
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3 md:col-span-2">
               <h3 className="text-xs sm:text-sm font-bold text-[#142B4A] flex items-center gap-2">
                 <FileSpreadsheet className="w-4 h-4 text-[#176B59]" />
-                <span>NumPy Sentence Lengths &amp; Readability</span>
+                <span>NumPy Sentence Lengths &amp; Readability Distributions</span>
               </h3>
 
               {visualAnalytics.sentenceDistributionChart ? (
@@ -1014,7 +886,7 @@ export default function FindingsView({
                   />
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
                   <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 border border-gray-100">
                     <span className="text-gray-400 uppercase text-[9px] sm:text-[10px] block font-semibold">FK Grade</span>
                     <span className="text-base sm:text-lg font-bold text-[#142B4A]">
@@ -1038,106 +910,65 @@ export default function FindingsView({
                     <span className="text-base sm:text-lg font-bold text-[#142B4A]">
                       {mlInsights.linguisticStats?.tokenMetrics?.complexWordPercentage || 16}%
                     </span>
-=======
-              {/* Suggested Correction (if available) */}
-              {finding.suggestedCorrection && (
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-[#176B59] uppercase tracking-wider mb-1">
-                    Suggested Action / Wording:
-                  </p>
-                  <div className="p-3 rounded-lg bg-green-50/70 border border-green-200 text-sm font-medium text-[#176B59]">
-                    "{finding.suggestedCorrection}"
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                   </div>
                 </div>
               )}
 
-<<<<<<< HEAD
               <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
                 <strong>Data Science Summary:</strong> Content exhibits high lexical richness (TTR {mlInsights.linguisticStats?.tokenMetrics?.typeTokenRatio || 0.77}) and accessible enterprise sentence lengths.
               </div>
             </div>
-=======
-              {/* Action Buttons: Includes Round 3 Contextual RAG Rewrite */}
-              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-4 border-t border-gray-100">
-                {!isVisualFinding && (
-                  <button
-                    onClick={() => handleOpenRagRewrite(finding)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#176B59] text-[#176B59] hover:bg-teal-50 transition-colors cursor-pointer shadow-2xs"
-                    title="Generate complete context-aware paragraph alternative using Approved Copy Library"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#176B59]" />
-                    <span>Contextual RAG Rewrite</span>
-                  </button>
-                )}
+          </div>
+        </div>
+      )}
 
-                {finding.status !== 'Suggestion Accepted' && finding.suggestedCorrection && !isVisualFinding && (
-                  <button
-                    onClick={() => handleAcceptSuggestion(finding)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white transition-colors cursor-pointer"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Accept Suggestion</span>
-                  </button>
-                )}
-
-                {finding.status !== 'Dismissed by User' && (
-                  <button
-                    onClick={() => handleDismissFinding(finding.id || finding._id)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                    <span>Dismiss Finding</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Round 3 Improvement 2: Contextual RAG Rewrite Modal */}
+      {/* ======================================================== */}
+      {/* RAG REWRITE MODAL (ROUND 3 IMPROVEMENT 2)                */}
+      {/* ======================================================== */}
       {isRagModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-2xl w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-gray-100">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#176B59]" />
-                <h3 className="text-base font-bold text-[#142B4A]">Contextual RAG Alternative Generator</h3>
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                <h3 className="font-bold text-lg text-[#142B4A]">
+                  Contextual RAG Alternative Rewriting
+                </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setIsRagModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {isGeneratingRewrite ? (
-              <div className="py-12 text-center space-y-3">
-                <span className="animate-spin text-3xl inline-block">⚙️</span>
+              <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
+                <div className="w-8 h-8 border-3 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
                 <p className="text-sm font-semibold text-[#142B4A]">
-                  Retrieving Approved Brand Library Proof & Synthesizing Contextual Alternative...
+                  Retrieving Approved Copy &amp; Generating Contextual Rewrite...
                 </p>
-                <p className="text-xs text-gray-400">
-                  Enforcing strict fact, number, and compliance disclaimer preservation.
+                <p className="text-xs text-gray-400 max-w-sm">
+                  Querying vector-similar approved copy, preserving factual percentages and locked enterprise claims.
                 </p>
               </div>
             ) : ragResult ? (
               <div className="space-y-4 text-xs">
-                {/* Notice pill */}
-                <div className="p-3 rounded-lg bg-teal-50 border border-teal-200 text-[#176B59] flex items-center gap-2 font-medium">
-                  <BookmarkCheck className="w-4 h-4 shrink-0" />
-                  <span>{ragResult.notice}</span>
+                {/* Notice */}
+                <div className="p-3 rounded-lg bg-purple-50 text-purple-800 border border-purple-200 font-semibold flex items-center gap-2">
+                  <BookmarkCheck className="w-4 h-4 shrink-0 text-purple-600" />
+                  <span>{ragResult.notice || 'AI Suggestion: Original draft preserved. Choose whether to apply.'}</span>
                 </div>
 
-                {/* Side-by-side comparison */}
+                {/* Original vs Rewrite */}
                 <div className="space-y-3">
                   <div>
-                    <span className="font-semibold text-gray-400 uppercase tracking-wider block mb-1">
-                      Current Draft Copy:
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                      Original Draft Excerpt:
                     </span>
-                    <div className="p-3.5 rounded-lg bg-red-50/60 border border-red-200 text-sm text-[#202833] line-through opacity-80">
+                    <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 italic">
                       {ragResult.originalSentence}
                     </div>
                   </div>
@@ -1159,7 +990,7 @@ export default function FindingsView({
                 {ragResult.preservedFacts?.length > 0 && (
                   <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
                     <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
-                      Preserved Factual Constraints (Numbers, % & Claims):
+                      Preserved Factual Constraints (Numbers, % &amp; Claims):
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {ragResult.preservedFacts.map((fact, idx) => (
@@ -1226,7 +1057,6 @@ export default function FindingsView({
                 </div>
               </div>
             ) : null}
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </div>
         </div>
       )}

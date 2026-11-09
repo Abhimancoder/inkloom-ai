@@ -31,23 +31,11 @@ router.post('/', async (req, res) => {
       })
     }
 
-<<<<<<< HEAD
-    if (!mongoose.isValidObjectId(checkId)) {
-      return res.status(400).json({ success: false, error: 'checkId must be a valid content check identifier' })
-    }
-
     const allowedDecisions = ['Approved', 'Changes Requested', 'Dismissed']
     if (!allowedDecisions.includes(decision)) {
       return res.status(400).json({ success: false, error: 'decision must be Approved, Changes Requested, or Dismissed' })
     }
 
-    const check = await ContentCheck.findById(checkId)
-    if (!check) {
-      return res.status(404).json({ success: false, error: 'Content check not found' })
-    }
-
-    // Save reviewer decision
-=======
     let check = null
     if (mongoose.isValidObjectId(checkId)) {
       check = await ContentCheck.findById(checkId)
@@ -92,7 +80,6 @@ router.post('/', async (req, res) => {
     }
 
     // Save reviewer decision in MongoDB
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     const newDecision = await ReviewDecision.create({
       checkId,
       decision,

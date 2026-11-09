@@ -19,12 +19,9 @@ export default function ReviewQueueView({
 }) {
   const [items, setItems] = useState(queueItems)
   const [comments, setComments] = useState({})
-<<<<<<< HEAD
   const [reviewerRole, setReviewerRole] = useState('Brand Team')
   const [reviewerName, setReviewerName] = useState('Abhiman (Team Lead)')
-=======
   const [webhookAlert, setWebhookAlert] = useState('')
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
   const handleCommentChange = (id, text) => {
     setComments((prev) => ({ ...prev, [id]: text }))
@@ -49,9 +46,6 @@ export default function ReviewQueueView({
       )
     )
 
-<<<<<<< HEAD
-    onReviewDecision(id, decision, comment, reviewerRole, reviewerName)
-=======
     // Trigger webhook banner upon approval
     if (decision === 'Approved') {
       setWebhookAlert(
@@ -60,31 +54,20 @@ export default function ReviewQueueView({
       setTimeout(() => setWebhookAlert(''), 6000)
     }
 
-    onReviewDecision(id, decision, comment)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+    onReviewDecision(id, decision, comment, reviewerRole, reviewerName)
   }
 
   const pendingItems = items.filter((i) => i.status === 'Pending Decision')
   const completedItems = items.filter((i) => i.status !== 'Pending Decision')
 
   return (
-<<<<<<< HEAD
     <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 w-full min-w-0">
       {/* Header (Responsive Stack on Phone) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#142B4A]">Human Review Queue</h2>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-            Human approval gate before publishing. Role-based routing and sign-off authority.
-=======
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#142B4A]">Human Review Queue</h2>
-          <p className="text-sm text-gray-500">
-            Mandatory human approval gate. Approved content automatically dispatches configured webhooks.
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+            Mandatory human approval gate. Role-based routing, sign-off authority, and automated webhook dispatch.
           </p>
         </div>
         <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-50 text-[#B7791F] border border-amber-200 flex items-center gap-1.5 self-start sm:self-auto shrink-0">
@@ -93,7 +76,6 @@ export default function ReviewQueueView({
         </span>
       </div>
 
-<<<<<<< HEAD
       {/* Reviewer Persona Bar (Slide 3 & 5) */}
       <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -127,7 +109,7 @@ export default function ReviewQueueView({
           />
         </div>
       </div>
-=======
+
       {/* Webhook Dispatch Live Notification */}
       {webhookAlert && (
         <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-[#2E7D32] flex items-center gap-3 animate-in fade-in zoom-in-95 duration-150 shadow-xs">
@@ -138,7 +120,6 @@ export default function ReviewQueueView({
           </div>
         </div>
       )}
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
       {/* Pending Items List */}
       <div className="space-y-3 sm:space-y-4">
@@ -200,42 +181,16 @@ export default function ReviewQueueView({
             </div>
 
             {/* Action Buttons */}
-<<<<<<< HEAD
-            <div className="flex flex-wrap items-center justify-end gap-2 pt-2 sm:pt-3 border-t border-gray-100">
-              <button
-                onClick={() => handleAction(item.id, 'Dismissed')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Dismiss</span>
-              </button>
-
-              <button
-                onClick={() => handleAction(item.id, 'Changes Requested')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#142B4A] hover:bg-[#1a385f] text-white transition-colors cursor-pointer shadow-xs"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Request Changes</span>
-              </button>
-
-              <button
-                onClick={() => handleAction(item.id, 'Approved')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white transition-colors cursor-pointer shadow-xs"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Approve &amp; Authorize</span>
-              </button>
-=======
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-100">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 sm:pt-3 border-t border-gray-100">
               <span className="text-[11px] text-gray-400 flex items-center gap-1">
                 <Webhook className="w-3 h-3 text-[#176B59]" />
                 Approval triggers Slack & CMS Draft sync
               </span>
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleAction(item.id, 'Dismissed')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Dismiss</span>
@@ -243,7 +198,7 @@ export default function ReviewQueueView({
 
                 <button
                   onClick={() => handleAction(item.id, 'Changes Requested')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#142B4A] hover:bg-[#1a385f] text-white transition-colors cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#142B4A] hover:bg-[#1a385f] text-white transition-colors cursor-pointer shadow-xs"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Request Changes</span>
@@ -251,13 +206,12 @@ export default function ReviewQueueView({
 
                 <button
                   onClick={() => handleAction(item.id, 'Approved')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#2E7D32] hover:bg-[#256328] text-white transition-colors cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2E7D32] hover:bg-[#256328] text-white transition-colors cursor-pointer shadow-xs"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Approve Content</span>
                 </button>
               </div>
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
             </div>
           </div>
         ))}
@@ -284,10 +238,14 @@ export default function ReviewQueueView({
                 className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
               >
                 <div>
-<<<<<<< HEAD
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-gray-800">{item.title}</span>
                     <span className="text-gray-400">· {item.channel}</span>
+                    {item.status === 'Approved' && (
+                      <span className="text-[10px] text-[#176B59] font-medium bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
+                        Dispatched to Slack, HubSpot, WordPress
+                      </span>
+                    )}
                   </div>
                   <p className="text-gray-500 mt-0.5 text-[11px]">
                     Decided by <span className="font-semibold text-gray-700">{item.reviewerName || 'Reviewer'}</span> ({item.reviewerRole || 'Brand Team'})
@@ -298,27 +256,6 @@ export default function ReviewQueueView({
                       "{item.reviewerNotes}"
                     </p>
                   )}
-=======
-                  <span className="font-semibold text-gray-800">{item.title}</span>
-                  <span className="text-gray-400 ml-2">({item.reviewerNotes})</span>
-                  {item.status === 'Approved' && (
-                    <span className="ml-2 text-[10px] text-[#176B59] font-medium bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
-                      Dispatched to Slack, HubSpot, WordPress
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`font-semibold px-2.5 py-0.5 rounded-full ${
-                      item.status === 'Approved'
-                        ? 'bg-green-50 text-[#2E7D32] border border-green-200'
-                        : 'bg-red-50 text-[#C62828] border border-red-200'
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                  <span className="text-gray-400">{item.decisionTime}</span>
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                 </div>
                 <span
                   className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] self-start sm:self-auto shrink-0 ${

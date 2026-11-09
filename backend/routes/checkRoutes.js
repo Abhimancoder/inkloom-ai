@@ -1,14 +1,10 @@
 import express from 'express'
-<<<<<<< HEAD
 import axios from 'axios'
-import mongoose from 'mongoose'
-=======
 import mongoose from 'mongoose'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { BrandProfile } from '../models/BrandProfile.js'
@@ -70,13 +66,8 @@ router.get('/', async (req, res) => {
   }
 })
 
-<<<<<<< HEAD
-// POST /api/checks - Submit draft & execute deterministic + Python Data Science & ML audit
-router.post('/', async (req, res) => {
-=======
-// POST /api/checks - Submit draft & execute unified text + visual audit
+// POST /api/checks - Submit draft & execute unified text + visual + ML audit
 router.post('/', upload.single('asset'), async (req, res) => {
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
   try {
     const { title, channel, brandProfileId, submittedBy, draftText } = req.body
 
@@ -86,14 +77,7 @@ router.post('/', upload.single('asset'), async (req, res) => {
 
     // 1. Look up target brand profile
     let profile = null
-<<<<<<< HEAD
-    if (brandProfileId) {
-      if (!mongoose.isValidObjectId(brandProfileId)) {
-        return res.status(400).json({ success: false, error: 'brandProfileId must be a valid profile identifier' })
-      }
-=======
     if (brandProfileId && mongoose.isValidObjectId(brandProfileId)) {
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
       profile = await BrandProfile.findById(brandProfileId)
       if (!profile) {
         return res.status(404).json({ success: false, error: 'Brand profile not found' })
@@ -112,7 +96,6 @@ router.post('/', upload.single('asset'), async (req, res) => {
 
     // 3. Connect to Python Data Science & ML Microservice (FastAPI on Port 8000)
     try {
-<<<<<<< HEAD
       const mlResponse = await axios.post(
         'http://localhost:8000/analyze',
         {
@@ -136,30 +119,6 @@ router.post('/', upload.single('asset'), async (req, res) => {
       }
     } catch (mlErr) {
       console.log(`[Inkloom Backend] ℹ️ Python ML service offline (${mlErr.message}). Using deterministic rule engine fallback.`)
-    }
-
-    // Recalculate summary counts with any ML findings included
-=======
-      const response = await fetch('http://localhost:8000/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: draftText,
-          targetTone: profile?.tone || 'Professional'
-        }),
-        signal: AbortSignal.timeout(1500)
-      })
-
-      if (response.ok) {
-        const nlpData = await response.json()
-        if (nlpData?.nlpFindings) {
-          combinedFindings = [...combinedFindings, ...nlpData.nlpFindings]
-          nlpMetrics = nlpData.metrics
-          console.log(`[Inkloom Backend] ✅ Python NLP service responded (Score: ${nlpData.governanceScore}/100)`)
-        }
-      }
-    } catch (nlpErr) {
-      console.log(`[Inkloom Backend] ℹ️ Python NLP service offline. Using deterministic rule engine as fallback.`)
     }
 
     // 4. Round 3 Improvement 1: Multi-Modal Visual Asset Audit
@@ -202,8 +161,7 @@ router.post('/', upload.single('asset'), async (req, res) => {
       }
     }
 
-    // Recalculate unified summary counts (text + visual)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+    // Recalculate unified summary counts (text + visual + ML)
     const criticalCount = combinedFindings.filter((f) => f.severityType === 'critical').length
     const warningCount = combinedFindings.filter((f) => f.severityType === 'warning').length
     const passedCount = combinedFindings.filter((f) => f.severityType === 'passed').length
@@ -219,7 +177,6 @@ router.post('/', upload.single('asset'), async (req, res) => {
       statusType = 'warning'
     }
 
-<<<<<<< HEAD
     // Readability & Linguistic stats merge
     const readabilityMerged = {
       readingEaseScore: nlpMetrics?.readingEaseScore ?? deterministicResults.readabilityMetrics.readingEaseScore,
@@ -231,10 +188,7 @@ router.post('/', upload.single('asset'), async (req, res) => {
       fleschKincaidGrade: nlpMetrics?.fleschKincaidGrade ?? 8.5
     }
 
-    // 4. Save ContentCheck in MongoDB
-=======
     // 5. Save ContentCheck in MongoDB
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     const newCheck = await ContentCheck.create({
       title: title || 'Untitled Content Check',
       channel: channel || 'Email Marketing',
@@ -247,17 +201,14 @@ router.post('/', upload.single('asset'), async (req, res) => {
       warningCount,
       passedCount,
       draftText,
-<<<<<<< HEAD
       governanceScore: deterministicResults.governanceScore || 90,
       categoryScores: deterministicResults.categoryScores,
       evidence: deterministicResults.evidence,
       visualAssets: req.body.visualAssets || [],
       readabilityMetrics: readabilityMerged,
       mlInsights,
-      visualAnalytics
-=======
+      visualAnalytics,
       ...assetMetadata
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     })
 
     // 6. Save each individual Finding in MongoDB
@@ -273,14 +224,10 @@ router.post('/', upload.single('asset'), async (req, res) => {
       data: {
         check: newCheck,
         findings: savedFindings,
-<<<<<<< HEAD
         mlInsights,
         visualAnalytics,
-        nlpMetrics
-=======
         nlpMetrics,
         visualAnalysis: visualResult
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
       }
     })
   } catch (error) {
@@ -292,11 +239,7 @@ router.post('/', upload.single('asset'), async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
-<<<<<<< HEAD
-      return res.status(400).json({ success: false, error: 'Content check ID is invalid' })
-=======
-      return res.status(404).json({ success: false, error: 'Content check not found' })
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+      return res.status(400).json({ success: false, error: 'Invalid content check ID format' })
     }
     const check = await ContentCheck.findById(req.params.id)
     if (!check) {

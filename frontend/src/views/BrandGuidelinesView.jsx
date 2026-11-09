@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useState } from 'react'
-=======
-import React, { useState, useEffect } from 'react'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
+import { useState, useEffect } from 'react'
 import {
   CheckCircle,
   Building2,

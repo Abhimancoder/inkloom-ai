@@ -36,7 +36,6 @@ const BrandProfileSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
-<<<<<<< HEAD
     brandColors: [
       {
         name: { type: String, default: 'Primary' },
@@ -59,7 +58,7 @@ const BrandProfileSchema = new mongoose.Schema(
     imageryGuidelines: {
       styleTags: { type: [String], default: ['Clean', 'Professional', 'Minimalist', 'Data-driven'] },
       forbiddenThemes: { type: [String], default: ['Low resolution', 'Generic stock clip art', 'Misleading statistics'] }
-=======
+    },
     // Round 3 Improvement 1: Multi-Modal Visual Governance Fields
     approvedPalette: {
       type: [String],
@@ -93,7 +92,6 @@ const BrandProfileSchema = new mongoose.Schema(
     clearSpaceRule: {
       type: String,
       default: '0.5x minimum clear space around logo mark'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     }
   },
   {

@@ -11,15 +11,12 @@ import { connectDB } from './config/db.js'
 import profileRoutes from './routes/profileRoutes.js'
 import checkRoutes from './routes/checkRoutes.js'
 import reviewRoutes from './routes/reviewRoutes.js'
-<<<<<<< HEAD
 import monitoringRoutes from './routes/monitoringRoutes.js'
 import reportRoutes from './routes/reportRoutes.js'
 import alertRoutes from './routes/alertRoutes.js'
-=======
 import approvedCopyRoutes from './routes/approvedCopyRoutes.js'
 import rewriteRoutes from './routes/rewriteRoutes.js'
 import integrationRoutes from './routes/integrationRoutes.js'
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
 // Load environment variables from .env
 dotenv.config()
@@ -40,29 +37,24 @@ const PORT = process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
 
-<<<<<<< HEAD
 // Connect to MongoDB
-=======
 // Serve static uploaded media safely
 app.use('/uploads', express.static(uploadsDir))
 
 // Connect to MongoDB Atlas
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 connectDB()
 
 // API Routes
 app.use('/api/profiles', profileRoutes)
 app.use('/api/checks', checkRoutes)
 app.use('/api/reviews', reviewRoutes)
-<<<<<<< HEAD
+app.use('/api/assistant', assistantRoutes)
 app.use('/api/monitoring', monitoringRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/alerts', alertRoutes)
-=======
 app.use('/api/approved-copy', approvedCopyRoutes)
 app.use('/api/rewrites', rewriteRoutes)
 app.use('/api/integrations', integrationRoutes)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
 // Health Check Endpoint (Required by Phase M1)
 app.get('/api/health', (req, res) => {

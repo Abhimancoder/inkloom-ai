@@ -19,6 +19,7 @@ import SettingsView from './views/SettingsView'
 import LandingPageView from './views/LandingPageView'
 import ApprovedCopyView from './views/ApprovedCopyView'
 import IntegrationsView from './views/IntegrationsView'
+import AssistantWidget from './components/AssistantWidget'
 
 import {
   SAMPLE_BRAND_PROFILES,
@@ -83,18 +84,6 @@ export default function App() {
   }, [])
 
   // 2. Submit Content Check via Backend API (Falls back to client engine if offline)
-<<<<<<< HEAD
-  const handleAuditSubmit = async ({ title, channel, brandProfileId, draftText, visualAssets = [] }) => {
-    try {
-      const result = await submitContentCheck({
-        title,
-        channel,
-        brandProfileId,
-        submittedBy: 'Content Author (Current User)',
-        draftText,
-        visualAssets
-      })
-=======
   const handleAuditSubmit = async ({ title, channel, brandProfileId, brandProfileName, draftText, assetFile }) => {
     try {
       // Build payload: use FormData if an image asset is attached
@@ -117,9 +106,7 @@ export default function App() {
         }
       }
 
-      // Attempt backend API call (Phase M5/M8 Axios integration)
       const result = await submitContentCheck(payload)
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
       if (result?.check && result?.findings) {
         const savedCheck = {
@@ -272,7 +259,6 @@ export default function App() {
       }
     }
 
-    // Heuristic findings if local/fallback
     const profile = brandProfiles.find((p) => p.name === check.brandProfileName) || brandProfiles[0]
     const matched = []
     const lower = (check.draftText || '').toLowerCase()
@@ -383,7 +369,6 @@ export default function App() {
   }
 
   const viewTitles = {
-<<<<<<< HEAD
     dashboard: { title: 'Studio Dashboard', subtitle: 'Overview of automated brand compliance and ongoing audit activity' },
     monitoring: { title: 'Continuous Brand Monitoring', subtitle: 'Real-time channel surveillance and regression scanning' },
     'new-check': { title: 'New Content Check', subtitle: 'Deterministic multi-factor audit against locked brand standards' },
@@ -391,15 +376,8 @@ export default function App() {
     'brand-guidelines': { title: 'Brand Guidelines Management', subtitle: 'Configure restricted phrases, mandatory terms, and voice' },
     'review-queue': { title: 'Human Review Queue', subtitle: 'Enterprise sign-off and role-based publishing authorization' },
     reports: { title: 'Governance Reports & Analytics', subtitle: 'Audit-ready compliance certificates and Matplotlib visual analytics' },
-=======
-    dashboard: { title: 'Studio Dashboard', subtitle: 'Real-time overview of content governance and recent reviews' },
-    'new-check': { title: 'New Content Check', subtitle: 'Submit marketing copy or draft for automated inspection' },
-    'brand-guidelines': { title: 'Brand Guidelines', subtitle: 'Maintain approved voice, restricted terminology and claims' },
     'approved-copy': { title: 'Approved Copy Library', subtitle: 'Gold-standard verified brand messaging corpus used for RAG re-writing' },
-    findings: { title: 'Audit Findings', subtitle: 'Structured evidence, matched rules and suggested corrections' },
-    'review-queue': { title: 'Review Queue', subtitle: 'Human reviewer approval gate before content publication' },
     integrations: { title: 'Webhook & CMS Integrations', subtitle: 'Manage Slack alerts, HubSpot, and WordPress headless connectors' },
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     history: { title: 'Audit History & Logs', subtitle: 'Historical record of content checks and reviewer decisions' },
     settings: { title: 'Platform Settings & Roles', subtitle: 'Cross-functional governance permissions and MongoDB diagnostics' }
   }
@@ -409,7 +387,8 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-[#F5F7FA] text-[#202833] font-sans antialiased">
-      {/* Responsive Sidebar (Slide-in Drawer on mobile/tablet, Sticky on desktop) */}
+      <AssistantWidget />
+      {/* Responsive Sidebar */}
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -419,7 +398,7 @@ export default function App() {
       />
 
       <div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
-        {/* Responsive Header with Hamburger Menu for Mobile/Tablet */}
+        {/* Responsive Header */}
         <Header
           title={activeHeader.title}
           subtitle={
@@ -435,7 +414,7 @@ export default function App() {
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />
 
-        {/* Main Content View Container with Responsive Fluid Padding */}
+        {/* Main Content View Container */}
         <main className="p-3 sm:p-5 md:p-6 lg:p-8 flex-1 overflow-y-auto pb-20 lg:pb-8 w-full min-w-0">
           {currentView === 'dashboard' && (
             <DashboardView
@@ -484,21 +463,20 @@ export default function App() {
             />
           )}
 
-<<<<<<< HEAD
           {currentView === 'reports' && (
             <ReportsView />
           )}
 
           {currentView === 'settings' && (
             <SettingsView />
-=======
+          )}
+
           {currentView === 'integrations' && (
             <IntegrationsView />
->>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           )}
 
           {currentView === 'history' && (
-            <div className="max-w-5xl mx-auto bg-white rounded-xl border border-gray-100 shadow-xs p-4 sm:p-6 lg:p-8 space-y-4">
+            <div className="max-w-5xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6 lg:p-8 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-[#142B4A]">Audit History &amp; Compliance Logs</h2>
@@ -550,7 +528,7 @@ export default function App() {
           )}
         </main>
 
-        {/* Mobile Quick Navigation Bar (Phones & Small Tablets < 1024px) */}
+        {/* Mobile Quick Navigation Bar */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#142B4A]/95 backdrop-blur-md border-t border-white/10 text-white flex items-center justify-around py-2 px-1 shadow-2xl">
           <button
             onClick={() => setCurrentView('dashboard')}
@@ -580,7 +558,7 @@ export default function App() {
           >
             <Search className="w-4 h-4" />
             <span>Findings</span>
-            <span className="absolute 1 top-0.5 right-2 w-1.5 h-1.5 rounded-full bg-red-500"></span>
+            <span className="absolute top-0.5 right-2 w-1.5 h-1.5 rounded-full bg-red-500"></span>
           </button>
 
           <button

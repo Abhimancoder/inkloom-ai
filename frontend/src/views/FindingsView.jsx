@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   AlertOctagon,
   AlertTriangle,
@@ -25,6 +25,18 @@ export default function FindingsView({
   )
   const [acceptedCount, setAcceptedCount] = useState(0)
 
+  // Sync localFindings and draft text when parent sends new data (fresh audit run)
+  useEffect(() => {
+    setLocalFindings(findings)
+    setAcceptedCount(0)
+  }, [findings])
+
+  useEffect(() => {
+    if (currentCheck?.draftText) {
+      setActiveDraft(currentCheck.draftText)
+    }
+  }, [currentCheck?.id])
+
   // Compute live summary counts
   const criticalCount = localFindings.filter((f) => f.severityType === 'critical').length
   const warningCount = localFindings.filter((f) => f.severityType === 'warning').length
@@ -33,18 +45,16 @@ export default function FindingsView({
   const handleAcceptSuggestion = (finding) => {
     if (!finding.suggestedCorrection) return
 
-    // Apply suggestion cleanly without destroying surrounding text
+    // Apply suggestion: use the excerpt text to find and replace in the draft
+    // Strip leading/trailing '...' markers from the excerpt
     let updated = activeDraft
-    if (finding.id === 'fnd_01') {
-      updated = updated.replace(
-        'best in class solution at cheap rates',
-        'enterprise-grade governance solution at competitive value'
-      )
-    } else if (finding.id === 'fnd_02') {
-      updated = updated.replace(
-        'guaranteed to eliminate 100% of errors',
-        'engineered to significantly reduce review turnaround times by up to 60%'
-      )
+    const rawExcerpt = finding.excerpt
+      ? finding.excerpt.replace(/^\.\.\./, '').replace(/\.\.\.$/, '').trim()
+      : ''
+    if (rawExcerpt && updated.toLowerCase().includes(rawExcerpt.toLowerCase())) {
+      const escapedExcerpt = rawExcerpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(escapedExcerpt, 'i')
+      updated = updated.replace(regex, finding.suggestedCorrection)
     }
 
     setActiveDraft(updated)

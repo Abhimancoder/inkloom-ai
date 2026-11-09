@@ -145,7 +145,6 @@ class NLPRequestHandler(BaseHTTPRequestHandler):
                 data = json.loads(post_data.decode('utf-8'))
                 text = data.get('content', '') or data.get('draftText', '')
                 target_tone = data.get('targetTone', 'Professional')
-
                 analysis = analyze_content(text, target_tone)
                 self._set_headers(200)
                 self.wfile.write(json.dumps(analysis).encode('utf-8'))
@@ -169,4 +168,5 @@ def run_server(port=8000):
         httpd.server_close()
 
 if __name__ == '__main__':
-    run_server()
+    run_server(port=8085)  # Change 8000 to 8085
+

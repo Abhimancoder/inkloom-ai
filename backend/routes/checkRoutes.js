@@ -1,4 +1,5 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import { ContentCheck } from '../models/ContentCheck.js'
 import { Finding } from '../models/Finding.js'
 import { BrandProfile } from '../models/BrandProfile.js'
@@ -25,9 +26,9 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Draft content text is required' })
     }
 
-    // 1. Look up target brand profile
+    // 1. Look up target brand profile (safely handles custom or sample string IDs)
     let profile = null
-    if (brandProfileId) {
+    if (brandProfileId && mongoose.isValidObjectId(brandProfileId)) {
       profile = await BrandProfile.findById(brandProfileId)
     }
     if (!profile) {
@@ -119,6 +120,9 @@ router.post('/', async (req, res) => {
 // GET /api/checks/:id - Get specific check with all its findings
 router.get('/:id', async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ success: false, error: 'Content check not found' })
+    }
     const check = await ContentCheck.findById(req.params.id)
     if (!check) {
       return res.status(404).json({ success: false, error: 'Content check not found' })

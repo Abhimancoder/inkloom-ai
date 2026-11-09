@@ -1,4 +1,5 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import { ReviewDecision } from '../models/ReviewDecision.js'
 import { ContentCheck } from '../models/ContentCheck.js'
 
@@ -26,6 +27,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'checkId and decision (Approved, Changes Requested, Dismissed) are required'
+      })
+    }
+
+    // If checkId is a local/mock ID (from offline mode), return graceful response
+    if (!mongoose.isValidObjectId(checkId)) {
+      return res.status(200).json({
+        success: true,
+        message: Content check marked as ${decision},
+        data: { checkId, decision, reviewerName: reviewerName || 'Human Reviewer', reviewerNotes: reviewerNotes || '' }
       })
     }
 

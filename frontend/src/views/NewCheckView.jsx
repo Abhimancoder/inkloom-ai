@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Send, FileEdit, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react'
 
 export default function NewCheckView({
@@ -13,6 +13,13 @@ export default function NewCheckView({
   )
   const [draftText, setDraftText] = useState('')
   const [isAuditing, setIsAuditing] = useState(false)
+
+  // Sync selectedProfileId when brandProfiles updates (e.g. loaded from MongoDB Atlas)
+  useEffect(() => {
+    if (brandProfiles?.length > 0 && !brandProfiles.some((p) => p.id === selectedProfileId)) {
+      setSelectedProfileId(brandProfiles[0].id)
+    }
+  }, [brandProfiles, selectedProfileId])
 
   // Sample quick-fill draft for instant hackathon demonstration
   const handleLoadSampleDraft = () => {

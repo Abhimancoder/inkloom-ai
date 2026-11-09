@@ -24,7 +24,7 @@ const ApprovedCopySchema = new mongoose.Schema(
     },
     channel: {
       type: String,
-      enum: ['Email Marketing', 'Social Media', 'Blog Post', 'Press Release', 'Ad Copy', 'Executive Speech', 'General'],
+      enum: ['Email Marketing', 'Social Media', 'Blog Post', 'Press Release', 'Ad Copy', 'Executive Speech', 'General', 'Newsletter', 'Website'],
       default: 'General'
     },
     contentType: {

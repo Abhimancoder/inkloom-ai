@@ -21,6 +21,11 @@ backend/node_modules/
 frontend/dist/
 frontend/build/
 
+# --- Python cache ---
+__pycache__/
+*.py[cod]
+ai-service/__pycache__/
+
 # --- Logs & Archives ---
 *.log
 npm-debug.log*
@@ -29,6 +34,10 @@ npm-debug.log*
 # --- OS files ---
 .DS_Store
 Thumbs.db
+
+# --- Uploads & Temporary Media ---
+backend/uploads/
+uploads/
 
 # --- Editor files ---
 .vscode/settings.json

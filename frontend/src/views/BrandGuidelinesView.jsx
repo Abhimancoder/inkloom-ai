@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState } from 'react'
+=======
+import React, { useState, useEffect } from 'react'
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 import {
   CheckCircle,
   Building2,
@@ -16,6 +20,15 @@ export default function BrandGuidelinesView({
 
   // Local state for editing active profile
   const [formData, setFormData] = useState({ ...brandProfiles[0] })
+
+  // Sync when brandProfiles updates (e.g. initial fetch from MongoDB Atlas)
+  useEffect(() => {
+    if (brandProfiles && brandProfiles.length > 0) {
+      const match = brandProfiles.find((p) => p.id === selectedProfile?.id) || brandProfiles[0]
+      setSelectedProfile(match)
+      setFormData({ ...match })
+    }
+  }, [brandProfiles])
 
   const handleSelectProfile = (profile) => {
     setSelectedProfile(profile)

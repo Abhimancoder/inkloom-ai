@@ -10,10 +10,16 @@
     "seed": "node seed.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.21.0",
+=======
+    "colorthief": "^3.5.0",
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "mongoose": "^9.12.0"
+    "mongoose": "^9.12.0",
+    "multer": "^2.5.0",
+    "sharp": "^0.35.5"
   }
 }

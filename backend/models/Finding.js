@@ -7,6 +7,12 @@ const FindingSchema = new mongoose.Schema(
       ref: 'ContentCheck',
       required: true
     },
+    // Round 3 Improvement 1: Multi-Modal Finding Type (text vs visual)
+    findingType: {
+      type: String,
+      enum: ['text', 'visual'],
+      default: 'text'
+    },
     severity: {
       type: String,
       enum: ['Critical', 'Warning', 'Passed'],
@@ -45,6 +51,10 @@ const FindingSchema = new mongoose.Schema(
       type: String,
       enum: ['Needs Review', 'Suggestion Accepted', 'Dismissed by User', 'Passed Check'],
       default: 'Needs Review'
+    },
+    visualDetails: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
     }
   },
   {

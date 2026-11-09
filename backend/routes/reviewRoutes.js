@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { ReviewDecision } from '../models/ReviewDecision.js'
 import { ContentCheck } from '../models/ContentCheck.js'
+import { triggerApprovalWebhooks } from '../services/webhookService.js'
 
 const router = express.Router()
 
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// POST /api/reviews - Record a human reviewer decision
+// POST /api/reviews - Record a human reviewer decision & dispatch approval webhooks
 router.post('/', async (req, res) => {
   try {
     const { checkId, decision, reviewerName, reviewerRole, reviewerNotes } = req.body
@@ -30,6 +31,7 @@ router.post('/', async (req, res) => {
       })
     }
 
+<<<<<<< HEAD
     if (!mongoose.isValidObjectId(checkId)) {
       return res.status(400).json({ success: false, error: 'checkId must be a valid content check identifier' })
     }
@@ -45,6 +47,52 @@ router.post('/', async (req, res) => {
     }
 
     // Save reviewer decision
+=======
+    let check = null
+    if (mongoose.isValidObjectId(checkId)) {
+      check = await ContentCheck.findById(checkId)
+    }
+
+    // Fallback mock check if offline/demo
+    if (!check) {
+      check = {
+        _id: checkId,
+        title: 'Brand Marketing Content Check',
+        channel: 'Email Marketing',
+        brandProfileName: 'TechCorp Enterprise'
+      }
+    }
+
+    // STRICT HUMAN GATE:
+    // If decision === 'Approved', trigger Slack/CMS webhooks!
+    let webhookResults = null
+    if (decision === 'Approved') {
+      webhookResults = await triggerApprovalWebhooks({
+        check,
+        decision,
+        reviewerName: reviewerName || 'Human Reviewer',
+        reviewerNotes: reviewerNotes || ''
+      })
+      console.log(`[Inkloom Backend] 🚀 Approval webhooks dispatched for "${check.title}":`, webhookResults)
+    }
+
+    // If checkId is a local/mock ID (from offline mode), return graceful response
+    if (!mongoose.isValidObjectId(checkId)) {
+      return res.status(200).json({
+        success: true,
+        message: `Content check marked as ${decision}`,
+        data: {
+          checkId,
+          decision,
+          reviewerName: reviewerName || 'Human Reviewer',
+          reviewerNotes: reviewerNotes || '',
+          webhookResults
+        }
+      })
+    }
+
+    // Save reviewer decision in MongoDB
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     const newDecision = await ReviewDecision.create({
       checkId,
       decision,
@@ -53,7 +101,7 @@ router.post('/', async (req, res) => {
       reviewerNotes: reviewerNotes || ''
     })
 
-    // Update the parent check's status in ContentCheck
+    // Update parent check's status in ContentCheck
     let newStatus = 'Pending Review'
     let newStatusType = 'warning'
 
@@ -75,7 +123,8 @@ router.post('/', async (req, res) => {
     res.status(201).json({
       success: true,
       message: `Content check marked as ${decision}`,
-      data: newDecision
+      data: newDecision,
+      webhookResults
     })
   } catch (error) {
     res.status(500).json({ success: false, error: error.message })

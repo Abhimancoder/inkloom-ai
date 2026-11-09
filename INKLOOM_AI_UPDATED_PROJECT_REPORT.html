@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inkloom AI — Project Submission & Architecture Report (Round 2)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #142B4A;
+      --brand-green: #176B59;
+      --bg: #F5F7FA;
+      --card-bg: #FFFFFF;
+      --text: #202833;
+      --text-muted: #64748B;
+      --critical: #C62828;
+      --warning: #B7791F;
+      --passed: #2E7D32;
+      --border: #E2E8F0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F8FAFC;
+      color: var(--text);
+      line-height: 1.55;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+      padding: 50px 60px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #EBF3F0;
+      color: var(--brand-green);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .link-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px;
+      background: #F1F5F9;
+      border-radius: 10px;
+      margin-bottom: 36px;
+    }
+
+    a.link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    a.link-pill:hover {
+      border-color: var(--brand-green);
+      background: #F8FAFC;
+    }
+
+    a.link-pill span.url {
+      color: #0D5C4A;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      text-decoration: underline;
+    }
+
+    a {
+      color: #176B59;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #EDF2F7;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    p, li {
+      font-size: 14.5px;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+      margin-bottom: 18px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .card {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .badge-critical { color: var(--critical); background: #FFEBEE; border: 1px solid #FFCDD2; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
+    .badge-warning { color: var(--warning); background: #FEF3C7; border: 1px solid #FDE68A; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
+    .badge-passed { color: var(--passed); background: #E8F5E9; border: 1px solid #C8E6C9; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #F1F5F9;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .img-preview {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin: 10px 0 16px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .callout {
+      background: #F0FDF4;
+      border-left: 4px solid var(--brand-green);
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: #14532D;
+    }
+
+    .page-break {
+      page-break-before: always;
+      margin-top: 30px;
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      a {
+        color: #176B59 !important;
+        text-decoration: underline !important;
+      }
+      a.link-pill {
+        border: 1px solid #CBD5E1 !important;
+        background: #F8FAFC !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-badge">Hackathon 2026 • Round 2 Project Submission</div>
+    <h1>Inkloom AI — Intelligent Brand Governance Platform</h1>
+    <p class="tagline">Enterprise-grade brand compliance, deterministic copy auditing, and human-in-the-loop review queue.</p>
+
+    <div class="link-bar">
+      <a href="https://inkloom-ai-snowy.vercel.app/" target="_blank" rel="noopener noreferrer" class="link-pill">
+        🌐 Live Product Demo: <span class="url">https://inkloom-ai-snowy.vercel.app/</span>
+      </a>
+      <a href="https://github.com/Abhimancoder/inkloom-ai" target="_blank" rel="noopener noreferrer" class="link-pill">
+        📁 Public GitHub Repository: <span class="url">https://github.com/Abhimancoder/inkloom-ai</span>
+      </a>
+    </div>
+
+    <h2>1. Executive Summary & Problem Solved</h2>
+    <p>
+      Marketing teams, content agencies, and generative AI tools create hundreds of outbound communication assets daily. Without continuous automated brand oversight, unverified superlative claims (e.g. <em>"100% foolproof"</em>, <em>"cheapest in market"</em>), off-brand tone, and missing mandatory legal disclaimers slip into published collateral.
+    </p>
+    <p>
+      <strong>Inkloom AI</strong> introduces an automated brand governance gatekeeper. Rather than taking control away from marketers with autonomous rewriting, Inkloom highlights exact non-compliant excerpts, matches them against organization brand guidelines, suggests professional drop-in replacements, and routes content to a <strong>Human Review Gate</strong> before publication.
+    </p>
+
+    <h2>2. Working Features Delivered in Round 2</h2>
+    <ul>
+      <li><strong>Deterministic Brand Audit Engine:</strong> Sub-second pattern matching that flags restricted phrases, unverified guarantees, and missing mandatory corporate terminology.</li>
+      <li><strong>Contextual Findings Screen:</strong> Isolates exact offending text excerpts with surrounding copy context, visual severity tags (<span class="badge-critical">Critical</span>, <span class="badge-warning">Warning</span>, <span class="badge-passed">Passed</span>), rule explanations, and confidence ratings.</li>
+      <li><strong>Non-Destructive In-Place Editor:</strong> Allows users to review, accept, or reject suggested replacements with instantaneous draft preview without modifying or destroying the original author's copy.</li>
+      <li><strong>Brand Guidelines Management:</strong> Full interface to configure target tones, restricted buzzwords, mandatory brand terminology, and approved legal statements per company profile.</li>
+      <li><strong>Human Review Queue:</strong> Collaborative approval workspace where authorized reviewers can Approve, Request Changes, or Dismiss drafts, recording reviewer identity and decision timestamps.</li>
+      <li><strong>Real-Time Analytics Dashboard:</strong> Live counters for Total Audits, Critical Violations, Awaiting Human Review, and Clean Approvals.</li>
+      <li><strong>One-Click Structured Audit Export:</strong> Generates and downloads comprehensive compliance audit reports in structured JSON for enterprise auditing trails.</li>
+      <li><strong>Resilient Offline-Capable Architecture:</strong> Single-page application that operates seamlessly against live cloud MongoDB Atlas backends while maintaining zero-friction offline caching if backend services are unreachable.</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>3. Product Visual Walkthrough</h2>
+    <div class="grid-2">
+      <div>
+        <div class="card-title">Live Governance Dashboard</div>
+        <img class="img-preview" src="02_Dashboard.jpg" alt="Dashboard">
+        <p class="card-desc">Audit metrics, activity history, and one-click quick audit launcher.</p>
+      </div>
+      <div>
+        <div class="card-title">Content Check & Audit Engine</div>
+        <img class="img-preview" src="03_New_Content_Check.jpg" alt="New Content Check">
+        <p class="card-desc">Channel selection, brand profile matching, and draft analysis.</p>
+      </div>
+      <div>
+        <div class="card-title">Contextual Findings & Live Preview</div>
+        <img class="img-preview" src="05_Findings.jpg" alt="Findings View">
+        <p class="card-desc">Exact excerpt highlighting, rule citations, and non-destructive replacement.</p>
+      </div>
+      <div>
+        <div class="card-title">Human Sign-Off Review Queue</div>
+        <img class="img-preview" src="06_Review_Queue.jpg" alt="Review Queue">
+        <p class="card-desc">Human gatekeeper workflow with approve, reject, and revision notes.</p>
+      </div>
+    </div>
+
+    <h2>4. Technology Stack & Implementation Details</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Role in System</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend</strong></td>
+          <td>React 19 + Vite 8 + Tailwind CSS v4</td>
+          <td>Single-page interactive dashboard, non-destructive editor, and Review Queue.</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>Node.js + Express.js REST API</td>
+          <td>Deterministic rule engine, profile management, and review decision logging.</td>
+        </tr>
+        <tr>
+          <td><strong>Database</strong></td>
+          <td>MongoDB Atlas + Mongoose ODM</td>
+          <td>Cloud storage for BrandProfiles, ContentChecks, Findings, and ReviewDecisions.</td>
+        </tr>
+        <tr>
+          <td><strong>AI / NLP Service</strong></td>
+          <td>Python 3.12 Microservice (FastAPI/HTTP)</td>
+          <td>Flesch Reading Ease readability scoring, syllable tokenization, and hype detection.</td>
+        </tr>
+        <tr>
+          <td><strong>Deployment</strong></td>
+          <td>Vercel (Frontend) + Git Version Control</td>
+          <td>High-availability public web deployment and open-source public repository.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Engineering Highlight:</strong> Zero-downtime client-server synchronization. The React client communicates with the Express/MongoDB Atlas backend via Axios, but features graceful deterministic client-side evaluation if remote microservices experience network latency.
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>5. Evolution: What Changed Since Round 1</h2>
+    <ul>
+      <li><strong>Shifted from Autonomous AI to Human-in-the-Loop Governance:</strong> In our initial proposal, we explored fully automated AI text re-writing. Testing revealed that autonomous re-writing introduces subtle hallucinations and risks stripping intended brand nuance. We restructured Inkloom into a decision-support platform with a mandatory Human Review Queue.</li>
+      <li><strong>Added Multi-Tier Deterministic + Statistical Safeguards:</strong> Rather than relying solely on black-box LLM prompts that can be inconsistent, we built a deterministic rule engine backed by MongoDB Atlas and a dedicated Python NLP microservice for readability and hype scoring.</li>
+      <li><strong>Added One-Click Audit Report Export:</strong> Created downloadable JSON audit trail reports so corporate compliance teams can store immutable records of every review decision.</li>
+    </ul>
+
+    <h2>6. Known Current Limitations ("What Does NOT Work Yet")</h2>
+    <ul>
+      <li><strong>Direct CMS / Social Webhook Publishing:</strong> The system currently outputs approved copy and JSON audit records; direct one-click pushing into live WordPress, HubSpot, or Buffer instances is planned for Round 3.</li>
+      <li><strong>Multi-Tenant Authentication Walls (RBAC):</strong> Full login/JWT authentication is intentionally relaxed in this demo build so judges can test all views instantly without creating credentials.</li>
+      <li><strong>Microservice Cloud Cold-Starts:</strong> If the secondary Python NLP microservice takes time to initialize on free-tier hosting, the platform transparently uses the deterministic engine to ensure zero judge disruption.</li>
+    </ul>
+
+    <h2>7. Three Major Improvements for Round 3</h2>
+    <div class="card" style="margin-bottom: 12px;">
+      <div class="card-title">1. Multi-Modal Asset & Visual Brand Governance</div>
+      <p class="card-desc">
+        Expand checks from pure copy to visual marketing assets. Users can upload banner graphics and slide decks; the engine will extract hex color palettes, test WCAG accessibility contrast ratios, and verify logo clear-space rules.
+      </p>
+    </div>
+    <div class="card" style="margin-bottom: 12px;">
+      <div class="card-title">2. Direct Headless CMS & Marketing Webhook Connectors</div>
+      <p class="card-desc">
+        Integrate bidirectional webhooks for HubSpot, WordPress, and Slack. Approved drafts in the Human Review Queue will automatically update draft status in the connected CMS and alert the campaign team in Slack.
+      </p>
+    </div>
+    <div class="card" style="margin-bottom: 12px;">
+      <div class="card-title">3. Domain-Specific RAG Tone Re-writer</div>
+      <p class="card-desc">
+        Implement Retrieval-Augmented Generation (RAG) over an enterprise's repository of previously approved copy. Rather than single-word substitutions, the system will offer full contextual alternative paragraphs calibrated to the organization's unique voice.
+      </p>
+    </div>
+
+    <h2>8. Team & Submission Verification</h2>
+    <p>
+      <strong>Project Name:</strong> Inkloom AI<br>
+      <strong>Repository:</strong> <a href="https://github.com/Abhimancoder/inkloom-ai">https://github.com/Abhimancoder/inkloom-ai</a> (Public)<br>
+      <strong>Live Product:</strong> <a href="https://inkloom-ai-snowy.vercel.app/">https://inkloom-ai-snowy.vercel.app/</a><br>
+      <strong>Team Members:</strong> Abhiman (Lead / Product & UX), Pranav Sharma (Backend & AI), Team Frontend Developer.
+    </p>
+  </div>
+
+</body>
+</html>

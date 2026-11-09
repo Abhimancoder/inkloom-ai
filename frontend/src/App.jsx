@@ -17,6 +17,8 @@ import MonitoringView from './views/MonitoringView'
 import ReportsView from './views/ReportsView'
 import SettingsView from './views/SettingsView'
 import LandingPageView from './views/LandingPageView'
+import ApprovedCopyView from './views/ApprovedCopyView'
+import IntegrationsView from './views/IntegrationsView'
 
 import {
   SAMPLE_BRAND_PROFILES,
@@ -81,6 +83,7 @@ export default function App() {
   }, [])
 
   // 2. Submit Content Check via Backend API (Falls back to client engine if offline)
+<<<<<<< HEAD
   const handleAuditSubmit = async ({ title, channel, brandProfileId, draftText, visualAssets = [] }) => {
     try {
       const result = await submitContentCheck({
@@ -91,6 +94,32 @@ export default function App() {
         draftText,
         visualAssets
       })
+=======
+  const handleAuditSubmit = async ({ title, channel, brandProfileId, brandProfileName, draftText, assetFile }) => {
+    try {
+      // Build payload: use FormData if an image asset is attached
+      let payload
+      if (assetFile) {
+        payload = new FormData()
+        payload.append('title', title || 'Untitled Content Check')
+        payload.append('channel', channel)
+        payload.append('brandProfileId', brandProfileId)
+        payload.append('submittedBy', 'Content Author (Current User)')
+        payload.append('draftText', draftText)
+        payload.append('asset', assetFile)
+      } else {
+        payload = {
+          title,
+          channel,
+          brandProfileId,
+          submittedBy: 'Content Author (Current User)',
+          draftText
+        }
+      }
+
+      // Attempt backend API call (Phase M5/M8 Axios integration)
+      const result = await submitContentCheck(payload)
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
       if (result?.check && result?.findings) {
         const savedCheck = {
@@ -354,6 +383,7 @@ export default function App() {
   }
 
   const viewTitles = {
+<<<<<<< HEAD
     dashboard: { title: 'Studio Dashboard', subtitle: 'Overview of automated brand compliance and ongoing audit activity' },
     monitoring: { title: 'Continuous Brand Monitoring', subtitle: 'Real-time channel surveillance and regression scanning' },
     'new-check': { title: 'New Content Check', subtitle: 'Deterministic multi-factor audit against locked brand standards' },
@@ -361,6 +391,15 @@ export default function App() {
     'brand-guidelines': { title: 'Brand Guidelines Management', subtitle: 'Configure restricted phrases, mandatory terms, and voice' },
     'review-queue': { title: 'Human Review Queue', subtitle: 'Enterprise sign-off and role-based publishing authorization' },
     reports: { title: 'Governance Reports & Analytics', subtitle: 'Audit-ready compliance certificates and Matplotlib visual analytics' },
+=======
+    dashboard: { title: 'Studio Dashboard', subtitle: 'Real-time overview of content governance and recent reviews' },
+    'new-check': { title: 'New Content Check', subtitle: 'Submit marketing copy or draft for automated inspection' },
+    'brand-guidelines': { title: 'Brand Guidelines', subtitle: 'Maintain approved voice, restricted terminology and claims' },
+    'approved-copy': { title: 'Approved Copy Library', subtitle: 'Gold-standard verified brand messaging corpus used for RAG re-writing' },
+    findings: { title: 'Audit Findings', subtitle: 'Structured evidence, matched rules and suggested corrections' },
+    'review-queue': { title: 'Review Queue', subtitle: 'Human reviewer approval gate before content publication' },
+    integrations: { title: 'Webhook & CMS Integrations', subtitle: 'Manage Slack alerts, HubSpot, and WordPress headless connectors' },
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     history: { title: 'Audit History & Logs', subtitle: 'Historical record of content checks and reviewer decisions' },
     settings: { title: 'Platform Settings & Roles', subtitle: 'Cross-functional governance permissions and MongoDB diagnostics' }
   }
@@ -434,6 +473,10 @@ export default function App() {
             />
           )}
 
+          {currentView === 'approved-copy' && (
+            <ApprovedCopyView brandProfiles={brandProfiles} />
+          )}
+
           {currentView === 'review-queue' && (
             <ReviewQueueView
               queueItems={reviewQueue}
@@ -441,12 +484,17 @@ export default function App() {
             />
           )}
 
+<<<<<<< HEAD
           {currentView === 'reports' && (
             <ReportsView />
           )}
 
           {currentView === 'settings' && (
             <SettingsView />
+=======
+          {currentView === 'integrations' && (
+            <IntegrationsView />
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           )}
 
           {currentView === 'history' && (

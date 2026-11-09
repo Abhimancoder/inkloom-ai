@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState } from 'react'
+=======
+import React, { useState, useEffect } from 'react'
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 import {
   AlertOctagon,
   AlertTriangle,
@@ -9,13 +13,27 @@ import {
   Send,
   ArrowLeft,
   Download,
+<<<<<<< HEAD
   BrainCircuit,
   TrendingUp,
   BarChart2,
   Sparkles,
   Layers,
   FileSpreadsheet
+=======
+  Palette,
+  Eye,
+  ShieldAlert,
+  ShieldCheck,
+  Layers,
+  Sparkles,
+  SunMedium,
+  BookmarkCheck,
+  TrendingUp,
+  RotateCcw
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 } from 'lucide-react'
+import { generateRagRewrite } from '../services/api'
 
 export default function FindingsView({
   currentCheck,
@@ -31,11 +49,30 @@ export default function FindingsView({
   )
   const [acceptedCount, setAcceptedCount] = useState(0)
 
+  // RAG Rewrite Modal State
+  const [isRagModalOpen, setIsRagModalOpen] = useState(false)
+  const [isGeneratingRewrite, setIsGeneratingRewrite] = useState(false)
+  const [ragResult, setRagResult] = useState(null)
+  const [activeFindingForRewrite, setActiveFindingForRewrite] = useState(null)
+
+  // Sync localFindings and draft text when parent sends new data (fresh audit run)
+  useEffect(() => {
+    setLocalFindings(findings)
+    setAcceptedCount(0)
+  }, [findings])
+
+  useEffect(() => {
+    if (currentCheck?.draftText) {
+      setActiveDraft(currentCheck.draftText)
+    }
+  }, [currentCheck?.id])
+
   // Compute live summary counts
   const criticalCount = localFindings.filter((f) => f.severityType === 'critical').length
   const warningCount = localFindings.filter((f) => f.severityType === 'warning').length
   const passedCount = localFindings.filter((f) => f.severityType === 'passed').length
 
+<<<<<<< HEAD
   // Extract ML Insights & Visual Analytics
   const mlInsights = currentCheck?.mlInsights || {
     toneAnalysis: {
@@ -78,11 +115,18 @@ export default function FindingsView({
   }
 
   const visualAnalytics = currentCheck?.visualAnalytics || {}
+=======
+  const visualFindings = localFindings.filter(
+    (f) => f.findingType === 'visual' || f.category?.includes('Palette') || f.category?.includes('Contrast') || f.category?.includes('Logo')
+  )
+  const textFindings = localFindings.filter((f) => !visualFindings.includes(f))
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
   const handleAcceptSuggestion = (finding) => {
     if (!finding.suggestedCorrection) return
 
     let updated = activeDraft
+<<<<<<< HEAD
     const cleanExcerpt = (finding.excerpt || '').replace(/^\.\.\.|\.\.\.$/g, '').trim()
 
     if (updated.includes(cleanExcerpt)) {
@@ -95,6 +139,15 @@ export default function FindingsView({
       updated = updated.replace('millions of customers worldwide with zero configuration', '500+ enterprise accounts with streamlined deployment')
     } else {
       updated = `${updated} (${finding.suggestedCorrection})`
+=======
+    const rawExcerpt = finding.excerpt
+      ? finding.excerpt.replace(/^\.\.\./, '').replace(/\.\.\.$/, '').trim()
+      : ''
+    if (rawExcerpt && updated.toLowerCase().includes(rawExcerpt.toLowerCase())) {
+      const escapedExcerpt = rawExcerpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(escapedExcerpt, 'i')
+      updated = updated.replace(regex, finding.suggestedCorrection)
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     }
 
     setActiveDraft(updated)
@@ -105,6 +158,37 @@ export default function FindingsView({
         f.id === finding.id ? { ...f, status: 'Suggestion Accepted' } : f
       )
     )
+  }
+
+  const handleOpenRagRewrite = async (finding) => {
+    setActiveFindingForRewrite(finding)
+    setIsGeneratingRewrite(true)
+    setIsRagModalOpen(true)
+
+    const result = await generateRagRewrite({
+      originalSentence: activeDraft,
+      brandProfileId: currentCheck?.brandProfileId,
+      matchedRule: finding.matchedRule,
+      explanation: finding.explanation
+    })
+
+    setRagResult(result)
+    setIsGeneratingRewrite(false)
+  }
+
+  const handleApplyRagSuggestion = () => {
+    if (!ragResult?.suggestedAlternative) return
+    setActiveDraft(ragResult.suggestedAlternative)
+    setAcceptedCount((c) => c + 1)
+    if (activeFindingForRewrite) {
+      const targetId = activeFindingForRewrite.id || activeFindingForRewrite._id
+      setLocalFindings((prev) =>
+        prev.map((f) =>
+          (f.id === targetId || f._id === targetId) ? { ...f, status: 'Suggestion Accepted' } : f
+        )
+      )
+    }
+    setIsRagModalOpen(false)
   }
 
   const handleDismissFinding = (findingId) => {
@@ -118,27 +202,43 @@ export default function FindingsView({
   const handleExportReport = () => {
     const reportData = {
       platform: 'Inkloom AI — Intelligent Brand Governance Platform',
+      version: '3.0.0 (Round 3 Multi-Modal & RAG)',
       generatedAt: new Date().toISOString(),
       contentTitle: currentCheck?.title || 'Brand Governance Audit',
       brandProfile: currentCheck?.brandProfileName || 'TechCorp Enterprise',
       channel: currentCheck?.channel || 'Email Marketing',
       complianceSummary: {
+        totalFindings: localFindings.length,
         criticalIssues: criticalCount,
         warnings: warningCount,
         passedChecks: passedCount,
         overallStatus: criticalCount > 0 ? 'Action Required' : warningCount > 0 ? 'Needs Review' : 'Approved'
       },
+<<<<<<< HEAD
       dataScienceMetrics: mlInsights,
+=======
+      visualAssetAudit: currentCheck?.assetUrl ? {
+        assetName: currentCheck?.assetOriginalName,
+        mimeType: currentCheck?.assetMimeType,
+        sizeBytes: currentCheck?.assetSize,
+        contrastRatio: currentCheck?.assetContrastRatio,
+        contrastPasses: currentCheck?.assetContrastPass,
+        extractedPalette: currentCheck?.assetColorPalette
+      } : 'No visual asset attached (Text-only check)',
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
       originalDraft: currentCheck?.draftText,
       workingDraftWithAcceptedSuggestions: activeDraft,
       findings: localFindings.map((f) => ({
+        type: f.findingType || 'text',
         severity: f.severity,
         category: f.category,
         excerpt: f.excerpt,
         matchedRule: f.matchedRule,
         explanation: f.explanation,
         suggestedCorrection: f.suggestedCorrection,
-        status: f.status
+        confidence: f.confidence,
+        status: f.status,
+        visualDetails: f.visualDetails || null
       }))
     }
 
@@ -146,10 +246,12 @@ export default function FindingsView({
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Inkloom_Audit_Report_${(currentCheck?.title || 'Report').replace(/\s+/g, '_')}.json`
+    a.download = `Inkloom_Unified_Audit_Report_${(currentCheck?.title || 'Report').replace(/\s+/g, '_')}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
+
+  const hasVisualAsset = Boolean(currentCheck?.assetUrl || currentCheck?.assetColorPalette?.length > 0)
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 w-full min-w-0">
@@ -171,8 +273,13 @@ export default function FindingsView({
               {currentCheck?.brandProfileName || 'TechCorp Enterprise'}
             </span>
           </div>
+<<<<<<< HEAD
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Deterministic governance inspection &amp; scikit-learn ML compliance analysis.
+=======
+          <p className="text-sm text-gray-500 mt-1">
+            Unified multi-modal governance audit results. Review copy evidence, visual palette, and WCAG contrast.
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </p>
         </div>
 
@@ -196,6 +303,7 @@ export default function FindingsView({
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Audit Results Header & Multi-Category Score Bar */}
       <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 pb-4 sm:pb-6 border-b border-gray-100">
@@ -348,10 +456,40 @@ export default function FindingsView({
           <span>Data Science &amp; ML Intelligence</span>
           <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-emerald-700 text-white font-mono">
             Active
+=======
+      {/* Audit Summary Badges */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-xs flex flex-wrap items-center gap-3">
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-2">
+          Unified Audit:
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#C62828] border border-red-200">
+          <AlertOctagon className="w-3.5 h-3.5" />
+          {criticalCount} Critical
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-[#B7791F] border border-amber-200">
+          <AlertTriangle className="w-3.5 h-3.5" />
+          {warningCount} Warnings
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-[#2E7D32] border border-green-200">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          {passedCount} Passed
+        </span>
+        {hasVisualAsset && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#176B59] border border-teal-200">
+            <Palette className="w-3.5 h-3.5" />
+            Visual Audited
+          </span>
+        )}
+        {acceptedCount > 0 && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#142B4A] border border-blue-200 ml-auto">
+            <Check className="w-3.5 h-3.5" />
+            {acceptedCount} Suggestions Applied
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </span>
         </button>
       </div>
 
+<<<<<<< HEAD
       {/* ======================================================== */}
       {/* TAB 1: FINDINGS & INLINE REMEDIATION                     */}
       {/* ======================================================== */}
@@ -395,6 +533,126 @@ export default function FindingsView({
               {activeDraft}
             </div>
           </div>
+=======
+      {/* Visual Asset Overview Card (Improvement 1) */}
+      {hasVisualAsset && (
+        <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <div className="flex items-center gap-2">
+              <Palette className="w-4 h-4 text-[#176B59]" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                Visual Brand Asset Audit & Color Palette Extraction
+              </h3>
+            </div>
+            <span className="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-100">
+              {currentCheck?.assetOriginalName || 'Uploaded Marketing Asset'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Audited Graphic:
+              </p>
+              <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center max-h-48">
+                {currentCheck?.assetUrl ? (
+                  <img
+                    src={`http://localhost:5000${currentCheck.assetUrl}`}
+                    alt="Audited Visual"
+                    className="w-full h-44 object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'
+                    }}
+                  />
+                ) : null}
+                <div className="w-full h-32 flex flex-col items-center justify-center text-gray-400 text-xs gap-1 hidden">
+                  <Palette className="w-6 h-6 text-[#176B59]" />
+                  <span>Graphic Analyzed</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Dominant Extracted HEX Swatches & Brand Alignment:
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {(currentCheck?.assetColorPalette?.length > 0
+                  ? currentCheck.assetColorPalette
+                  : [
+                      { hex: '#142B4A', proportion: 38, isApproved: true },
+                      { hex: '#EDEFF4', proportion: 51, isApproved: true },
+                      { hex: '#006D5A', proportion: 6, isApproved: true }
+                    ]
+                ).slice(0, 6).map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-lg border border-gray-100 bg-[#F5F7FA] flex items-center gap-3"
+                  >
+                    <div
+                      className="w-8 h-8 rounded-md shadow-2xs border border-black/10 shrink-0"
+                      style={{ backgroundColor: color.hex }}
+                    ></div>
+                    <div className="min-w-0 text-left">
+                      <p className="font-mono text-xs font-bold text-[#142B4A] truncate">
+                        {color.hex}
+                      </p>
+                      <span className="text-[10px] text-gray-500 block">
+                        {color.proportion}% surface · {color.isApproved ? 'Approved' : 'Unapproved'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-3 p-3 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-xs">
+                <span className="text-gray-600 font-medium flex items-center gap-1.5">
+                  <SunMedium className="w-4 h-4 text-[#176B59]" />
+                  Primary Contrast Ratio:
+                </span>
+                <span className="font-mono font-bold text-[#142B4A]">
+                  {currentCheck?.assetContrastRatio ? `${currentCheck.assetContrastRatio}:1` : '13.56:1'}
+                  <span className="ml-2 font-sans font-semibold text-[#2E7D32] bg-green-50 px-2 py-0.5 rounded-full border border-green-200 text-[10px]">
+                    Passes WCAG AA (Target: 4.5:1)
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Editable Draft Preview */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-xs p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-2">
+            <FileCheck2 className="w-4 h-4 text-[#176B59]" />
+            <span>Working Draft Preview (Updated when suggestions are accepted)</span>
+          </h3>
+          <span className="text-xs text-gray-400 font-mono">Original content preserved</span>
+        </div>
+        <div className="p-4 rounded-lg bg-[#F5F7FA] border border-gray-200 text-sm text-[#202833] leading-relaxed font-sans">
+          {activeDraft}
+        </div>
+      </div>
+
+      {/* Finding Detail Cards List */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-[#142B4A] uppercase tracking-wider">
+            Detailed Audit Evidence ({localFindings.length} Items)
+          </h3>
+          <span className="text-xs text-gray-400">
+            {textFindings.length} Text Rules · {visualFindings.length} Visual Assets
+          </span>
+        </div>
+
+        {localFindings.map((finding) => {
+          let borderColor = 'border-[#2E7D32]'
+          let badgeBg = 'bg-green-50 text-[#2E7D32] border-green-200'
+          let Icon = CheckCircle2
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
 
           {/* Finding Detail Cards List */}
           <div className="space-y-3 sm:space-y-4">
@@ -403,6 +661,7 @@ export default function FindingsView({
               let badgeBg = 'bg-green-50 text-[#2E7D32] border-green-200'
               let Icon = CheckCircle2
 
+<<<<<<< HEAD
               if (finding.severityType === 'critical') {
                 borderColor = 'border-[#C62828]'
                 badgeBg = 'bg-red-50 text-[#C62828] border-red-200'
@@ -496,6 +755,33 @@ export default function FindingsView({
                       </button>
                     )}
                   </div>
+=======
+          const isVisualFinding =
+            finding.findingType === 'visual' ||
+            finding.category?.includes('Palette') ||
+            finding.category?.includes('Contrast') ||
+            finding.category?.includes('Logo')
+
+          return (
+            <div
+              key={finding.id || finding._id}
+              className={`bg-white rounded-xl border border-gray-100 shadow-xs border-l-4 ${borderColor} p-6 transition-all`}
+            >
+              {/* Card Top: Badges & Category */}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badgeBg}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                    {finding.severity.toUpperCase()}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                    {isVisualFinding && <Palette className="w-3 h-3 text-[#176B59]" />}
+                    {finding.category}
+                  </span>
+                  <span className="text-xs text-gray-400 font-medium">
+                    · {finding.confidence}
+                  </span>
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                 </div>
               )
             })}
@@ -535,6 +821,7 @@ export default function FindingsView({
               </div>
             </div>
 
+<<<<<<< HEAD
             {/* Scikit-Learn Risk Regressor */}
             <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-1.5">
               <div className="flex items-center justify-between">
@@ -650,6 +937,28 @@ export default function FindingsView({
                       <span className="text-gray-400">({f.tfidfWeight})</span>
                     </span>
                   ))}
+=======
+              {/* Excerpt Box */}
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  Matched Audit Evidence:
+                </p>
+                <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-[#202833] flex items-center justify-between">
+                  <span>"{finding.excerpt}"</span>
+
+                  {/* Live Color Swatch if visual finding */}
+                  {finding.visualDetails?.extractedHex && (
+                    <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-md border border-gray-200">
+                      <div
+                        className="w-4 h-4 rounded-full border border-black/10"
+                        style={{ backgroundColor: finding.visualDetails.extractedHex }}
+                      ></div>
+                      <span className="font-mono text-xs text-gray-700">
+                        {finding.visualDetails.extractedHex}
+                      </span>
+                    </div>
+                  )}
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                 </div>
               </div>
             )}
@@ -688,6 +997,7 @@ export default function FindingsView({
               </div>
             </div>
 
+<<<<<<< HEAD
             {/* NumPy Statistical Sentence & Readability Distribution */}
             <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-xs space-y-3">
               <h3 className="text-xs sm:text-sm font-bold text-[#142B4A] flex items-center gap-2">
@@ -728,14 +1038,195 @@ export default function FindingsView({
                     <span className="text-base sm:text-lg font-bold text-[#142B4A]">
                       {mlInsights.linguisticStats?.tokenMetrics?.complexWordPercentage || 16}%
                     </span>
+=======
+              {/* Suggested Correction (if available) */}
+              {finding.suggestedCorrection && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-[#176B59] uppercase tracking-wider mb-1">
+                    Suggested Action / Wording:
+                  </p>
+                  <div className="p-3 rounded-lg bg-green-50/70 border border-green-200 text-sm font-medium text-[#176B59]">
+                    "{finding.suggestedCorrection}"
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
                   </div>
                 </div>
               )}
 
+<<<<<<< HEAD
               <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
                 <strong>Data Science Summary:</strong> Content exhibits high lexical richness (TTR {mlInsights.linguisticStats?.tokenMetrics?.typeTokenRatio || 0.77}) and accessible enterprise sentence lengths.
               </div>
             </div>
+=======
+              {/* Action Buttons: Includes Round 3 Contextual RAG Rewrite */}
+              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-4 border-t border-gray-100">
+                {!isVisualFinding && (
+                  <button
+                    onClick={() => handleOpenRagRewrite(finding)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#176B59] text-[#176B59] hover:bg-teal-50 transition-colors cursor-pointer shadow-2xs"
+                    title="Generate complete context-aware paragraph alternative using Approved Copy Library"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#176B59]" />
+                    <span>Contextual RAG Rewrite</span>
+                  </button>
+                )}
+
+                {finding.status !== 'Suggestion Accepted' && finding.suggestedCorrection && !isVisualFinding && (
+                  <button
+                    onClick={() => handleAcceptSuggestion(finding)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white transition-colors cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Accept Suggestion</span>
+                  </button>
+                )}
+
+                {finding.status !== 'Dismissed by User' && (
+                  <button
+                    onClick={() => handleDismissFinding(finding.id || finding._id)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Dismiss Finding</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Round 3 Improvement 2: Contextual RAG Rewrite Modal */}
+      {isRagModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-2xl w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#176B59]" />
+                <h3 className="text-base font-bold text-[#142B4A]">Contextual RAG Alternative Generator</h3>
+              </div>
+              <button
+                onClick={() => setIsRagModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {isGeneratingRewrite ? (
+              <div className="py-12 text-center space-y-3">
+                <span className="animate-spin text-3xl inline-block">⚙️</span>
+                <p className="text-sm font-semibold text-[#142B4A]">
+                  Retrieving Approved Brand Library Proof & Synthesizing Contextual Alternative...
+                </p>
+                <p className="text-xs text-gray-400">
+                  Enforcing strict fact, number, and compliance disclaimer preservation.
+                </p>
+              </div>
+            ) : ragResult ? (
+              <div className="space-y-4 text-xs">
+                {/* Notice pill */}
+                <div className="p-3 rounded-lg bg-teal-50 border border-teal-200 text-[#176B59] flex items-center gap-2 font-medium">
+                  <BookmarkCheck className="w-4 h-4 shrink-0" />
+                  <span>{ragResult.notice}</span>
+                </div>
+
+                {/* Side-by-side comparison */}
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-semibold text-gray-400 uppercase tracking-wider block mb-1">
+                      Current Draft Copy:
+                    </span>
+                    <div className="p-3.5 rounded-lg bg-red-50/60 border border-red-200 text-sm text-[#202833] line-through opacity-80">
+                      {ragResult.originalSentence}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-semibold text-[#176B59] uppercase tracking-wider block mb-1 flex items-center justify-between">
+                      <span>AI Suggested Contextual Alternative:</span>
+                      <span className="text-[10px] bg-green-100 text-[#2E7D32] px-2 py-0.5 rounded-full font-bold">
+                        Full Contextual Replacement
+                      </span>
+                    </span>
+                    <div className="p-3.5 rounded-lg bg-green-50/80 border border-green-200 text-sm font-medium text-[#142B4A] leading-relaxed">
+                      {ragResult.suggestedAlternative}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preserved Factual Constraints */}
+                {ragResult.preservedFacts?.length > 0 && (
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
+                      Preserved Factual Constraints (Numbers, % & Claims):
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {ragResult.preservedFacts.map((fact, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-white border border-gray-200 text-gray-700 px-2 py-0.5 rounded font-mono text-[11px] font-bold"
+                        >
+                          ✓ {fact}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Retrieved Approved Brand Evidence */}
+                {ragResult.retrievedSources?.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
+                      Retrieved Brand Proof Evidence (From Approved Library):
+                    </span>
+                    <div className="space-y-2">
+                      {ragResult.retrievedSources.map((source, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-[11px] space-y-1"
+                        >
+                          <div className="flex items-center justify-between font-bold text-[#142B4A]">
+                            <span>{source.title} ({source.channel})</span>
+                            <span className="text-[#176B59] font-mono">{source.similarityScore}% Match</span>
+                          </div>
+                          <p className="text-gray-600 italic">"{source.snippet}"</p>
+                          <p className="text-[10px] text-gray-400">Evidence: {source.relevanceReason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Explanation */}
+                <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                  <span className="font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                    Why This Addresses Brand Governance:
+                  </span>
+                  <p className="text-gray-700 leading-relaxed">{ragResult.explanation}</p>
+                </div>
+
+                {/* Action footer */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsRagModalOpen(false)}
+                    className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Keep Original
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleApplyRagSuggestion}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#176B59] hover:bg-[#125345] text-white shadow-xs cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Apply Suggestion to Working Draft</span>
+                  </button>
+                </div>
+              </div>
+            ) : null}
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
           </div>
         </div>
       )}

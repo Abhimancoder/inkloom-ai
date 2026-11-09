@@ -51,6 +51,7 @@ const ContentCheckSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Draft content text is required']
     },
+<<<<<<< HEAD
     governanceScore: {
       type: Number,
       default: 90
@@ -95,6 +96,36 @@ const ContentCheckSchema = new mongoose.Schema(
     visualAnalytics: {
       toneDistributionChart: { type: String, default: null },
       sentenceDistributionChart: { type: String, default: null }
+=======
+    // Round 3 Improvement 1: Multi-Modal Visual Asset Metadata
+    assetUrl: {
+      type: String,
+      default: null
+    },
+    assetOriginalName: {
+      type: String,
+      default: null
+    },
+    assetMimeType: {
+      type: String,
+      default: null
+    },
+    assetSize: {
+      type: Number,
+      default: null
+    },
+    assetColorPalette: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: []
+    },
+    assetContrastRatio: {
+      type: Number,
+      default: null
+    },
+    assetContrastPass: {
+      type: Boolean,
+      default: null
+>>>>>>> faa97547145795a42e32a147158687ca4b3a25bc
     }
   },
   {

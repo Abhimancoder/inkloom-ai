@@ -193,3 +193,66 @@ export const generateRagRewrite = async ({
     }
   }
 }
+// ================================================================
+// 6. Headless CMS & Collaboration Webhooks (Round 3)
+// ================================================================
+export const getIntegrations = async () => {
+  try {
+    const response = await client.get('/integrations')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Integrations fetch offline fallback:', error.message)
+    return [
+      {
+        provider: 'slack',
+        displayName: 'Slack Brand Alerts',
+        enabled: true,
+        mode: 'simulation',
+        status: 'Test Mode',
+        targetChannelOrEndpoint: '#brand-governance-alerts',
+        publishAsDraftOnly: true,
+        lastStatusMessage: 'Ready for human approval events'
+      },
+      {
+        provider: 'hubspot',
+        displayName: 'HubSpot Marketing Hub',
+        enabled: true,
+        mode: 'simulation',
+        status: 'Test Mode',
+        targetChannelOrEndpoint: '/crm/v3/objects/marketing_drafts',
+        publishAsDraftOnly: true,
+        lastStatusMessage: 'Syncs approved copy directly as Draft Post'
+      },
+      {
+        provider: 'wordpress',
+        displayName: 'WordPress Headless CMS',
+        enabled: true,
+        mode: 'simulation',
+        status: 'Test Mode',
+        targetChannelOrEndpoint: '/wp-json/wp/v2/posts (status=draft)',
+        publishAsDraftOnly: true,
+        lastStatusMessage: 'Creates draft post awaiting publication editor'
+      }
+    ]
+  }
+}
+
+export const updateIntegration = async (provider, updateData) => {
+  try {
+    const response = await client.put(`/integrations/${provider}`, updateData)
+    return response.data?.data
+  } catch (error) {
+    console.error('[Inkloom API] Error updating integration:', error.message)
+    throw error
+  }
+}
+
+export const getIntegrationEvents = async () => {
+  try {
+    const response = await client.get('/integrations/events')
+    return response.data?.data || []
+  } catch (error) {
+    console.warn('[Inkloom API] Webhook events fetch offline fallback:', error.message)
+    return []
+  }
+}

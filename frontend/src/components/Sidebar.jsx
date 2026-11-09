@@ -10,7 +10,8 @@ import {
   Settings,
   Globe,
   ShieldCheck,
-  BookmarkCheck
+  BookmarkCheck,
+  Webhook
 } from 'lucide-react'
 
 export default function Sidebar({ currentView, setCurrentView, pendingReviewCount = 2 }) {
@@ -21,6 +22,7 @@ export default function Sidebar({ currentView, setCurrentView, pendingReviewCoun
     { id: 'approved-copy', label: 'Approved Copy', icon: BookmarkCheck },
     { id: 'findings', label: 'Findings', icon: Search, badge: '2 Issues' },
     { id: 'review-queue', label: 'Review Queue', icon: CheckSquare, badgeCount: pendingReviewCount },
+    { id: 'integrations', label: 'Integrations', icon: Webhook },
     { id: 'history', label: 'History & Logs', icon: History },
     { id: 'reports', label: 'Reports', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },

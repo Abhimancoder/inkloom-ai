@@ -8,6 +8,7 @@ import BrandGuidelinesView from './views/BrandGuidelinesView'
 import ReviewQueueView from './views/ReviewQueueView'
 import LandingPageView from './views/LandingPageView'
 import ApprovedCopyView from './views/ApprovedCopyView'
+import IntegrationsView from './views/IntegrationsView'
 
 import {
   SAMPLE_BRAND_PROFILES,
@@ -292,6 +293,7 @@ export default function App() {
     'approved-copy': { title: 'Approved Copy Library', subtitle: 'Gold-standard verified brand messaging corpus used for RAG re-writing' },
     findings: { title: 'Audit Findings', subtitle: 'Structured evidence, matched rules and suggested corrections' },
     'review-queue': { title: 'Review Queue', subtitle: 'Human reviewer approval gate before content publication' },
+    integrations: { title: 'Webhook & CMS Integrations', subtitle: 'Manage Slack alerts, HubSpot, and WordPress headless connectors' },
     history: { title: 'Audit History & Logs', subtitle: 'Historical record of content checks and reviewer decisions' },
     reports: { title: 'Governance Reports', subtitle: 'Compliance metrics and recurring brand violation trends' },
     settings: { title: 'Studio Settings', subtitle: 'Platform preferences and team role configurations' }
@@ -365,6 +367,10 @@ export default function App() {
               queueItems={reviewQueue}
               onReviewDecision={handleReviewDecision}
             />
+          )}
+
+          {currentView === 'integrations' && (
+            <IntegrationsView />
           )}
 
           {currentView === 'history' && (

@@ -13,6 +13,7 @@ import checkRoutes from './routes/checkRoutes.js'
 import reviewRoutes from './routes/reviewRoutes.js'
 import approvedCopyRoutes from './routes/approvedCopyRoutes.js'
 import rewriteRoutes from './routes/rewriteRoutes.js'
+import integrationRoutes from './routes/integrationRoutes.js'
 
 // Load environment variables from .env
 dotenv.config()
@@ -45,6 +46,7 @@ app.use('/api/checks', checkRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/approved-copy', approvedCopyRoutes)
 app.use('/api/rewrites', rewriteRoutes)
+app.use('/api/integrations', integrationRoutes)
 
 // Health Check Endpoint (Required by Phase M1)
 app.get('/api/health', (req, res) => {
@@ -84,4 +86,5 @@ app.listen(PORT, () => {
   console.log(`[Inkloom Backend] Reviews API at http://localhost:${PORT}/api/reviews`)
   console.log(`[Inkloom Backend] Approved Copy API at http://localhost:${PORT}/api/approved-copy`)
   console.log(`[Inkloom Backend] RAG Rewrites API at http://localhost:${PORT}/api/rewrites/generate`)
+  console.log(`[Inkloom Backend] Integrations API at http://localhost:${PORT}/api/integrations`)
 })

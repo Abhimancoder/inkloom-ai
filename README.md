@@ -177,11 +177,12 @@ npm run dev
 ---
 
 ## 👥 Team & Participant Details (CodeNexus Hackathon)
-* **Team Name:** ryanmishra4551 | **Team ID:** %65\n* **College:** Shri Ramswaroop Memorial University (Department of Computer Science)
-* **Aryan Mishra (Team Leader):** Frontend & Full-Stack Developer. Dashboard, upload interface, findings, reports, and component integration.
+* **Team Name:** ryanmishra4551 | **Team ID:** %65
+* **College:** Shri Ramswaroop Memorial University (Department of Computer Science)
+* **Aryan Mishra (Team Leader):** Time Management / Tester. Quality assurance, test execution, findings verification, and compliance reports.
 * **Pranav Sharma (Participant 2):** Backend & AI Developer. Express REST APIs, Mongoose data models, MongoDB persistence, and Python NLP microservice.
 * **Labeeba Khan (Participant 3):** Research & Documentation Lead. Problem statement validation, testing, brand governance compliance rules, and pitch presentation.
-* **Abhiman Singh Yadav (Participant 4):** UI/UX & Product Lead. Design system (Inkloom Studio Navy/Emerald palette), responsive card layouts, Findings screen architecture, review queue workflow, and application flow.
+* **Abhiman Singh Yadav (Participant 4):** UI/UX & Product Lead / Frontend Developer. Design system (Inkloom Studio Navy/Emerald palette), responsive card layouts, Findings screen architecture, Dashboard, New Check interface, review queue workflow, and application flow.
 
 ---
 

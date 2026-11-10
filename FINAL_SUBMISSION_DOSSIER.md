@@ -130,8 +130,8 @@ const FACT_PATTERNS = [
 ├──────────────────────────┬──────────────────────────┬──────────────────┤
 │ Member                   │ Role                     │ Key Deliverable  │
 ├──────────────────────────┼──────────────────────────┼──────────────────┤
-│ Aryan Mishra             │ Team Leader & Full-Stack │ Frontend UI/UX,  │
-│                          │ Developer                │ Reports & State  │
+│ Aryan Mishra             │ Team Leader & QA /       │ Frontend UI/UX,  │
+│                          │ Tester                   │ Testing & Reports  │
 ├──────────────────────────┼──────────────────────────┼──────────────────┤
 │ Pranav Sharma            │ Backend & AI Developer   │ Node.js APIs, ML │
 │                          │                          │ Service & DB     │
@@ -144,10 +144,10 @@ const FACT_PATTERNS = [
 └──────────────────────────┴──────────────────────────┴──────────────────┘
 ```
 
-1. **Aryan Mishra (Team Leader — Frontend & Full-Stack Developer):**
-   * Designed the responsive Studio UI using Tailwind CSS v4 and React 19.
-   * Built the New Check submission interface, continuous monitoring dashboard, and visual chart layouts.
-   * Managed state coordination and API client error handling.
+1. **Aryan Mishra (Team Leader — Time Management / Tester):**
+   * Coordinated milestone scheduling, timeline adherence, and team synchronization.
+   * Conducted QA testing on audit findings, empty states, and compliance reports.
+   * Verified user journey flows and submission requirements.
 
 2. **Pranav Sharma (Participant 2 — Backend & AI Developer):**
    * Engineered the Express REST API backend and MongoDB Atlas schemas.
@@ -159,10 +159,10 @@ const FACT_PATTERNS = [
    * Formulated the test matrices, validation checklists, and compliance requirements.
    * Drafted the pitch deck presentation and user-testing documentation.
 
-4. **Abhiman Singh Yadav (Participant 4 — Product & Architecture Lead):**
-   * Implemented the Multi-Modal Visual Auditing engine with Sharp, ColorThief, and WCAG relative luminance.
-   * Designed the Contextual RAG Rewriting pipeline with regex-based fact preservation.
-   * Built the Webhook Connector architecture with the human approval gate and idempotency protections.
+4. **Abhiman Singh Yadav (Participant 4 — UI/UX & Product Lead / Frontend Developer):**
+   * Designed the Inkloom Studio UI system (Navy/Emerald palette), responsive card layouts, Dashboard, New Check interface, and Review Queue.
+   * Engineered the Multi-Modal Visual Auditing engine with Sharp, ColorThief, and WCAG relative luminance math.
+   * Built the Contextual RAG Rewriting pipeline and Webhook Connector architecture with the human approval gate.
 
 ---
 

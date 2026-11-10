@@ -19,7 +19,7 @@
 
 We have delivered all three promised Round 3 improvements with zero dropped constraints, plus full-stack governance enhancements:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────────┐
 │                      INKLOOM AI WORKFLOW PIPELINE                      │
 ├────────────────────────────────────────────────────────────────────────┤
@@ -72,18 +72,23 @@ We have delivered all three promised Round 3 improvements with zero dropped cons
 ### Core Mathematical Formulas & Algorithms
 
 #### 1. WCAG 2.1 Relative Luminance & Contrast Ratio
-For each sRGB channel ($C \in \{R, G, B\}$ normalized to $[0, 1]$):
-* If $C \le 0.04045 \implies C_{\text{linear}} = C / 12.92$
-* Else $\implies C_{\text{linear}} = ((C + 0.055) / 1.055)^{2.4}$
+For each sRGB channel (R, G, B normalized to 0.0 - 1.0):
 
-Relative Luminance ($L$):
-$$L = 0.2126 \cdot R_{\text{linear}} + 0.7152 \cdot G_{\text{linear}} + 0.0722 \cdot B_{\text{linear}}$$
+```text
+Linear Channel Calculation:
+  If C <= 0.04045  -->  C_linear = C / 12.92
+  Else             -->  C_linear = ((C + 0.055) / 1.055) ^ 2.4
+
+Relative Luminance (L):
+  L = (0.2126 * R_linear) + (0.7152 * G_linear) + (0.0722 * B_linear)
 
 Contrast Ratio:
-$$\text{Ratio} = \frac{\max(L_1, L_2) + 0.05}{\min(L_1, L_2) + 0.05}$$
+  Ratio = (max(L1, L2) + 0.05) / (min(L1, L2) + 0.05)
 
-* Verified Level AA Threshold: $\ge 4.5:1$
-* Verified Level AAA Threshold: $\ge 7.0:1$
+Threshold Benchmarks:
+  • Level AA Normal Text   : >= 4.5:1
+  • Level AAA High Contrast: >= 7.0:1
+```
 
 #### 2. Factual Constraint Preservation Engine
 The RAG rewriting engine uses tokenized regular expressions to extract and lock immutable constraints:
@@ -119,7 +124,7 @@ const FACT_PATTERNS = [
 * **Team Name:** `ryanmishra4551` | **Team ID:** `%65`
 * **Institution:** Shri Ramswaroop Memorial University (Department of Computer Science)
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        TEAM CONTRIBUTION MATRIX                        │
 ├──────────────────────────┬──────────────────────────┬──────────────────┤

@@ -2,7 +2,7 @@ import express from 'express'
 
 const router = express.Router()
 
-const DEFAULT_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
+const DEFAULT_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b'
 const MAX_MESSAGES = 12
 const MAX_MESSAGE_LENGTH = 4000
 

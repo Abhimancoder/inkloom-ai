@@ -22,12 +22,16 @@ export default function ReviewQueueView({
   const [reviewerRole, setReviewerRole] = useState('Brand Team')
   const [reviewerName, setReviewerName] = useState('Abhiman (Team Lead)')
   const [webhookAlert, setWebhookAlert] = useState('')
+  const [isProcessing, setIsProcessing] = useState({})
 
   const handleCommentChange = (id, text) => {
     setComments((prev) => ({ ...prev, [id]: text }))
   }
 
-  const handleAction = (id, decision) => {
+  const handleAction = async (id, decision) => {
+    if (isProcessing[id]) return // Prevent repeated double-clicks
+    setIsProcessing((prev) => ({ ...prev, [id]: true }))
+
     const comment = comments[id] || ''
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
@@ -54,7 +58,11 @@ export default function ReviewQueueView({
       setTimeout(() => setWebhookAlert(''), 6000)
     }
 
-    onReviewDecision(id, decision, comment, reviewerRole, reviewerName)
+    try {
+      await onReviewDecision(id, decision, comment, reviewerRole, reviewerName)
+    } finally {
+      setIsProcessing((prev) => ({ ...prev, [id]: false }))
+    }
   }
 
   const pendingItems = items.filter((i) => i.status === 'Pending Decision')
@@ -189,27 +197,42 @@ export default function ReviewQueueView({
 
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
+                  disabled={isProcessing[item.id]}
                   onClick={() => handleAction(item.id, 'Dismissed')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Dismiss</span>
                 </button>
 
                 <button
+                  type="button"
+                  disabled={isProcessing[item.id]}
                   onClick={() => handleAction(item.id, 'Changes Requested')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#142B4A] hover:bg-[#1a385f] text-white transition-colors cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#142B4A] hover:bg-[#1a385f] disabled:opacity-50 text-white transition-colors cursor-pointer shadow-xs"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Request Changes</span>
                 </button>
 
                 <button
+                  type="button"
+                  disabled={isProcessing[item.id]}
                   onClick={() => handleAction(item.id, 'Approved')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2E7D32] hover:bg-[#256328] text-white transition-colors cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2E7D32] hover:bg-[#256328] disabled:opacity-50 text-white transition-colors cursor-pointer shadow-xs"
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Approve Content</span>
+                  {isProcessing[item.id] ? (
+                    <>
+                      <span className="animate-spin text-xs">⚙️</span>
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Approve Content</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

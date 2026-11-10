@@ -81,6 +81,15 @@ app.get('/api/health', (req, res) => {
   })
 })
 
+// Global Error Handler (Handles Multer file errors, validation errors, bad inputs)
+app.use((err, req, res, next) => {
+  console.error('[Inkloom Error]', err.message)
+  res.status(err.status || 400).json({
+    success: false,
+    error: err.message || 'An unexpected error occurred during request processing'
+  })
+})
+
 // Fallback 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' })

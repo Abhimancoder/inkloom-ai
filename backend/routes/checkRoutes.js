@@ -72,7 +72,11 @@ router.post('/', upload.single('asset'), async (req, res) => {
     const { title, channel, brandProfileId, submittedBy, draftText } = req.body
 
     if (!draftText || !draftText.trim()) {
-      return res.status(400).json({ success: false, error: 'Draft content text is required' })
+      return res.status(400).json({ success: false, error: 'Draft content text cannot be empty' })
+    }
+
+    if (draftText.length > 25000) {
+      return res.status(400).json({ success: false, error: 'Draft content exceeds the 25,000 character maximum limit' })
     }
 
     // 1. Look up target brand profile

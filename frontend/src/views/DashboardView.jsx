@@ -289,6 +289,14 @@ export default function DashboardView({
                   </tr>
                 )
               })}
+
+              {checks.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-6 py-10 text-center text-gray-400 text-xs">
+                    No content checks recorded yet. Click <span className="font-semibold text-[#142B4A]">"New Check"</span> above to audit your first marketing draft.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -32,6 +32,7 @@ export default function NewCheckView({
   const [assetFile, setAssetFile] = useState(null)
   const [assetPreview, setAssetPreview] = useState(null)
   const [fileError, setFileError] = useState('')
+  const [validationError, setValidationError] = useState('')
 
   // Sync selectedProfileId when brandProfiles updates (e.g. loaded from MongoDB Atlas)
   useEffect(() => {
@@ -106,22 +107,31 @@ export default function NewCheckView({
     )
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!draftText.trim()) return
+    if (!draftText.trim()) {
+      setValidationError('Please enter draft content text or choose one of the sample drafts above.')
+      return
+    }
 
+    if (isAuditing) return // Prevent rapid double-clicks
+    setValidationError('')
     setIsAuditing(true)
 
-    const selectedProfile = brandProfiles.find((p) => p.id === selectedProfileId)
-    onSubmitCheck({
-      title: title || 'Untitled Content Draft',
-      channel,
-      brandProfileId: selectedProfileId,
-      brandProfileName: selectedProfile?.name || 'Standard Brand Profile',
-      draftText,
-      assetFile
-    })
-    setIsAuditing(false)
+    try {
+      const selectedProfile = brandProfiles.find((p) => p.id === selectedProfileId)
+      await onSubmitCheck({
+        title: title || 'Untitled Content Draft',
+        channel,
+        brandProfileId: selectedProfileId,
+        brandProfileName: selectedProfile?.name || 'Standard Brand Profile',
+        draftText,
+        assetFile
+      })
+    } catch (err) {
+      setValidationError('Audit check failed: ' + (err.message || 'Please verify network connection.'))
+      setIsAuditing(false)
+    }
   }
 
   return (
@@ -241,9 +251,18 @@ export default function NewCheckView({
             rows={7}
             placeholder="Paste your marketing draft, email body, or social copy here for governance analysis..."
             value={draftText}
-            onChange={(e) => setDraftText(e.target.value)}
+            onChange={(e) => {
+              setDraftText(e.target.value)
+              if (validationError) setValidationError('')
+            }}
             className="w-full p-3 sm:p-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A] text-xs sm:text-sm text-[#202833] leading-relaxed resize-y"
           ></textarea>
+          {validationError && (
+            <p className="text-xs text-[#C62828] font-semibold mt-1.5 flex items-center gap-1.5 animate-in fade-in duration-150">
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>{validationError}</span>
+            </p>
+          )}
         </div>
 
         {/* Row 4: Round 3 Improvement 1 — Multi-Modal Visual Asset Upload */}
